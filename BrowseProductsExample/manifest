@@ -1,8 +1,8 @@
-#appname: BrowseProductsExample
-#publisher: alex.medearis
-#url: http://www.bazaarvoice.com
-#image: appicon.png
-#appid: com.bazaarvoice.browseproducts
-#desc: undefined
-#type: ipad
-#guid: ca0dc509-2705-4409-b1ff-d33e872cc532
+#appname:BrowseProductsExample
+#publisher:alex.medearis
+#url:http://www.bazaarvoice.com
+#image:appicon.png
+#appid:com.bazaarvoice.browseproducts
+#desc:not specified
+#type:mobile
+#guid:ca0dc509-2705-4409-b1ff-d33e872cc532

@@ -3,7 +3,7 @@ function CompletionScreen(review) {
 	var completionScreen = new ContainerWindow();
 	mainView = completionScreen.mainView;
 
-	Ti.include("lib/colors.js");
+	Ti.include("/lib/colors.js");
 
 	var Stars = require('stars/Stars');
 
@@ -30,33 +30,34 @@ function CompletionScreen(review) {
 	});
 	mainView.add(title);
 
-
 	var stars = Stars.createStars({
+		top: 0,
 		width : "100%",
 		height : "20%",
-		rating : review.stars
+		rating : review.rating
 	});
 	mainView.add(stars);
 	
 	var row = Ti.UI.createView({
 		width: "100%",
-		height: "50%"
+		height: "50%",
+		layout:"horizontal"
 	})
 	
 	var imView = Ti.UI.createImageView({
 		image : review.image,
-		width : "30%",
+		width : "40%",
 		height : "100%",
-		left: 5
+		left: "7%"
 	});
 	row.add(imView);
 
-	var review = Ti.UI.createTextArea({
-		value: review.reviewText,
+	var reviewText = Ti.UI.createLabel({
+		text: review.reviewText,
 		backgroundColor : "white",
-		width : "50%",
+		width : "40%",
 		height : "100%",
-		paddingLeft : 5,
+		left: "7%",
 		borderWidth : 1,
 		borderRadius : 5,
 		borderColor : secondaryTextBoxColor,
@@ -64,9 +65,8 @@ function CompletionScreen(review) {
 		font : {
 			fontSize : 12
 		},
-		editable: false
 	});
-	row.add(review);
+	row.add(reviewText);
 
 	mainView.add(row);
 

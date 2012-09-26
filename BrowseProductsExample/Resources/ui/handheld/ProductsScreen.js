@@ -22,7 +22,7 @@ function ProductsScreen(query) {
 		format : 'json',
 		normalize : false
 	});
-	BV.products().withStatsOn("reviews").include("reviews").send({
+	BV.products().withStatsOn("reviews").search(query).include("reviews").send({
 		success : handleData,
 		error : handleData
 	});

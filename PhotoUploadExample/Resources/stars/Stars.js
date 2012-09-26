@@ -10,10 +10,10 @@ function createStars(args) {
 	function setStarRating(rating){
 		view.rating = rating;
 		for (var i = 0; i < rating; i++) {
-			view["star" + i].image = "/stars/star.png";
+			view["star" + i].image = "/images/graphic_star_filled.png";
 		}
 		for (var i = rating; i < 5; i++) {
-			view["star" + i].image = "/stars/emptystar.png";
+			view["star" + i].image = "/images/graphic_star.png";
 		}
 	}
 
@@ -25,20 +25,24 @@ function createStars(args) {
 
 	for (var i = 0; i < args.rating; i++) {
 		var star = Ti.UI.createImageView({
-			image : "/stars/star.png",
+			image : "/images/graphic_star_filled.png",
 			width : "19%"
 		});
-		star.addEventListener("click", getHandler(i));
+		if(args.editable){
+			star.addEventListener("click", getHandler(i));			
+		}
 		view["star" + i] = star;
 		view.add(star);
 	}
 	
 	for (var i = args.rating; i < 5; i++) {
 		var star = Ti.UI.createImageView({
-			image : "/stars/emptystar.png",
+			image : "/images/graphic_star.png",
 			width : "19%"
 		});
-		star.addEventListener("click", getHandler(i));
+		if(args.editable){
+			star.addEventListener("click", getHandler(i));
+		}
 		view["star" + i] = star;
 		view.add(star);
 	}

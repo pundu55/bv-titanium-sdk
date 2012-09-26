@@ -18,6 +18,7 @@ function FormScreen(imData) {
 
 
 	var Stars = require('stars/Stars');
+	Ti.include("/lib/colors.js");
 
 	var title = Ti.UI.createTextField({
 		hintText : "Title",
@@ -39,8 +40,9 @@ function FormScreen(imData) {
 	var stars = Stars.createStars({
 		top : 0,
 		width : "100%",
-		height : "10%",
-		rating : 2
+		height : "20%",
+		rating : 2,
+		editable: true
 	});
 	mainView.add(stars);
 
@@ -71,10 +73,10 @@ function FormScreen(imData) {
 
 	mainView.add(nickname);
 
-	var review = Ti.UI.createTextArea({
+	var reviewText = Ti.UI.createTextArea({
 		backgroundColor : "white",
 		width : "100%",
-		height : "30%",
+		height : "20%",
 		paddingLeft : 5,
 		paddingRight : 5,
 		width : "90%",
@@ -88,7 +90,7 @@ function FormScreen(imData) {
 		top : 10
 	})
 
-	mainView.add(review);
+	mainView.add(reviewText);
 
 	var submit = Ti.UI.createButton({
 		title : "Submit",
@@ -120,7 +122,7 @@ function FormScreen(imData) {
 
 
 	function submitReview() {
-		BV.submitReview().withTitle(title.value).withPhoto(photoUploadUrl).withUserId('craiggil').withProductId('12345').withRating(stars.rating).withUserNickname(nickname.value).withReviewText(review.value).withAction("preview").send({
+		BV.submitReview().withTitle(title.value).withPhoto(photoUploadUrl).withUserId('craiggil').withProductId('12345').withRating(stars.rating).withUserNickname(nickname.value).withReviewText(reviewText.value).withAction("preview").send({
 			success : handleFormSubmission,
 			error : formScreen.handleFormSubmission
 		});
@@ -129,7 +131,7 @@ function FormScreen(imData) {
 	var CompletionScreen = require('ui/handheld/CompletionScreen');
 
 	function handleFormSubmission(data){
-		var completionScreen = new CompletionScreen({title: title.value, image: photoUploadUrl, rating: stars.rating, reviewText: review.value});
+		var completionScreen = new CompletionScreen({title: title.value, image: photoUploadUrl, rating: stars.rating, reviewText: reviewText.value});
 		completionScreen.nav = formScreen.nav;
 		formScreen.nav.closeWindow(formScreen, false);
 		formScreen.nav.pushWindow(completionScreen);		
