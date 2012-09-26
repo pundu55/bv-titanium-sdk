@@ -1,0 +1,32 @@
+Logfile initialized
+[INFO] logfile = /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/build.log
+[DEBUG] /Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py simulator KitchenSink /Users/alex.medearis/android-sdks /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink com.bazaarvoice.kitchensink 12 WVGA854 
+[INFO] Building KitchenSink for Android ... one moment
+[INFO] Titanium SDK version: 2.1.1 (07/27/12 14:01 0fd84a2)
+[DEBUG] Waiting for device to be ready ...
+[TRACE] adb devices returned 1 devices/emulators
+[DEBUG] Device connected... (waited 0 seconds)
+[DEBUG] waited 0.014946 seconds on emulator to get ready
+[DEBUG] com.bazaarvoice.kitchensink installed? True
+[INFO] Fastdev server running, deploying in Fastdev mode
+[INFO] Copying CommonJS modules...
+[INFO] Copying project resources..
+[TRACE] COPYING MODIFIED FILE: /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/ui/handheld/MainScreen.js => /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/build/android/bin/assets/Resources/ui/handheld/MainScreen.js
+[INFO] Tiapp.xml unchanged, skipping class generation
+[DEBUG] Processing Android resource drawables
+[DEBUG] found drawable-long-land-hdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-long-land-hdpi/default.png
+[DEBUG] found drawable-long-land-ldpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-long-land-ldpi/default.png
+[DEBUG] found drawable-long-port-hdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-long-port-hdpi/default.png
+[DEBUG] found drawable-long-port-ldpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-long-port-ldpi/default.png
+[DEBUG] found drawable-notlong-land-hdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-land-hdpi/default.png
+[DEBUG] found drawable-notlong-land-ldpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-land-ldpi/default.png
+[DEBUG] found drawable-notlong-land-mdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-land-mdpi/default.png
+[DEBUG] found drawable-notlong-port-hdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-port-hdpi/default.png
+[DEBUG] found drawable-notlong-port-ldpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-port-ldpi/default.png
+[DEBUG] found drawable-notlong-port-mdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/KitchenSink/Resources/android/images/res-notlong-port-mdpi/default.png
+[INFO] Waiting for SDCard to become available..
+[INFO] Re-launching application ... KitchenSink
+[INFO] Launching application ... KitchenSink
+[TRACE] Launch output: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.bazaarvoice.kitchensink/.KitchensinkActivity }
+
+[INFO] Android Emulator has exited
