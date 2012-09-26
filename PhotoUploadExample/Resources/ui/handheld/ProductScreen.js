@@ -71,7 +71,7 @@ function ProductScreen() {
 	function fetchImage(){
 		// resourcesDirectory is actually the default location, so the first 
 		// argument could be omitted here.
-		var file = Ti.Filesystem.getFile("test.png");
+		var file = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory,'images/test.jpg');
 		var blob = file.read();
 		Ti.API.log(blob);
 		
@@ -88,7 +88,7 @@ function ProductScreen() {
 	row.add(rate);
 
 	var dryer = Ti.UI.createImageView({
-		image : "images/dryer.png",
+		image : "/images/dryer.png",
 		height : "100%",
 		width : "40%",
 		left : "55%"

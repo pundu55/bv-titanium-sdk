@@ -2,7 +2,7 @@ function ContainerWindow() {
 	Ti.include("/lib/colors.js");
 
 	var win = Ti.UI.createWindow({
-		backgroundImage : "images/app_background.png",
+		backgroundImage : "images/app_background2.png",
 		translucent : true,
 		barColor : secondaryColor,
 
