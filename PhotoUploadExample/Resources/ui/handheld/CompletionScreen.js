@@ -1,3 +1,9 @@
+//
+//  CompletionScreen
+//
+//  Displays the submitted review and thanks the user for their submission.
+//
+
 function CompletionScreen(review) {
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
 	var completionScreen = new ContainerWindow();
@@ -67,6 +73,7 @@ function CompletionScreen(review) {
 		},
 	});
 	row.add(reviewText);
+	
 
 	mainView.add(row);
 

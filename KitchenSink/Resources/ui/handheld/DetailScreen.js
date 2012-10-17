@@ -1,3 +1,10 @@
+//
+//  DetailScreen
+//
+//  Displays the data response
+//
+
+
 function DetailScreen(data) {
     var win = Ti.UI.createWindow({
     	layout: "vertical",

@@ -1,3 +1,10 @@
+//
+//  Stars
+//
+//  Custom view for displaying star ratings.  Accepts args = {top, width, height, rating} where rating is
+//  an integer value.
+
+
 function createStars(args) {
 	var view = Ti.UI.createView({
 		top : args.top,
@@ -7,6 +14,7 @@ function createStars(args) {
 	});
 	view.rating = args.rating;
 
+	// Function to set stars to a new rating
 	function setStarRating(rating){
 		view.rating = rating;
 		for (var i = 0; i < rating; i++) {
@@ -17,12 +25,15 @@ function createStars(args) {
 		}
 	}
 
+	// Returns a handler function for setting star rating to the provided rating (clickedStar)
+	// This is necessary to create a new context and corresponding handler
 	function getHandler(clickedStar) {
 	    return function() {
 			setStarRating(clickedStar + 1);
 	    };
 	}
 
+	// Lay out rating number of filled stars...
 	for (var i = 0; i < args.rating; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star_filled.png",
@@ -35,6 +46,7 @@ function createStars(args) {
 		view.add(star);
 	}
 	
+	// Lay out unfilled stars...
 	for (var i = args.rating; i < 5; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star.png",
