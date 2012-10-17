@@ -1,21 +1,19 @@
 Logfile initialized
-[INFO] logfile = /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/BrowseProductsExample/build.log
-[DEBUG] /Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py simulator BrowseProductsExample /Users/alex.medearis/android-sdks /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/BrowseProductsExample com.bazaarvoice.browseproducts 4 WVGA854 
+[INFO] logfile = /Users/alex.medearis/Desktop/bv-titanium-sdk/BrowseProductsExample/build.log
+[DEBUG] /Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py simulator BrowseProductsExample /Users/alex.medearis/android-sdks /Users/alex.medearis/Desktop/bv-titanium-sdk/BrowseProductsExample com.bazaarvoice.browseproducts 4 WVGA854 
 [INFO] Building BrowseProductsExample for Android ... one moment
 [INFO] Titanium SDK version: 2.1.1 (07/27/12 14:01 0fd84a2)
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
-[TRACE] adb devices returned 1 devices/emulators
-[DEBUG] Device connected... (waited 5 seconds)
-[DEBUG] waited 5.055714 seconds on emulator to get ready
-[INFO] Waiting for the Android Emulator to become available
+[DEBUG] Device connected... (waited 0 seconds)
+[DEBUG] waited 0.047685 seconds on emulator to get ready
 [DEBUG] com.bazaarvoice.browseproducts installed? True
 [INFO] Fastdev server running, deploying in Fastdev mode
 [INFO] Copying CommonJS modules...
 [INFO] Copying project resources..
 [INFO] Tiapp.xml unchanged, skipping class generation
 [DEBUG] Processing Android resource drawables
-[DEBUG] copying app icon: /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/BrowseProductsExample/build/android/bin/assets/Resources/appicon.png
+[DEBUG] copying app icon: /Users/alex.medearis/Desktop/bv-titanium-sdk/BrowseProductsExample/build/android/bin/assets/Resources/appicon.png
 [ERROR] Exception occured while building Android project:
 [ERROR] Traceback (most recent call last):
 [ERROR]   File "/Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py", line 2236, in <module>
@@ -28,5 +26,4 @@ Logfile initialized
 [ERROR]     copyfile(src, dst)
 [ERROR]   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 81, in copyfile
 [ERROR]     with open(src, 'rb') as fsrc:
-[ERROR] IOError: [Errno 2] No such file or directory: u'/Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/BrowseProductsExample/build/android/bin/assets/Resources/appicon.png'
-[DEBUG] signal caught: 15
+[ERROR] IOError: [Errno 2] No such file or directory: u'/Users/alex.medearis/Desktop/bv-titanium-sdk/BrowseProductsExample/build/android/bin/assets/Resources/appicon.png'

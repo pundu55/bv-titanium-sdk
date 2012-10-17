@@ -1,3 +1,8 @@
+//
+//  Colors
+//
+//  Contains all of the colors used throughout the application
+
 var primaryColor = "#003c45";
 var secondaryColor = "#00ab8e";
 var borderColor = "#647791";

@@ -1,3 +1,8 @@
+//
+//  ReviewDetailScreen
+//
+//  ReviewDetailScreen displays details of a specific review
+
 function ReviewDetailScreen(review) {
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
 	var detailScreen = new ContainerWindow();
