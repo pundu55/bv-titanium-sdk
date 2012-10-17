@@ -1,3 +1,8 @@
+//
+//  App
+//
+//  Single entry point for the application.  Simply creates MainScreen and opens it within our Navigation framework.
+
 (function() {
 	var MainScreen = require('ui/handheld/MainScreen');
 	var firstScreen = new MainScreen();

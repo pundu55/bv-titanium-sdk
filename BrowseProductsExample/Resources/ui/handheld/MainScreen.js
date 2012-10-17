@@ -1,3 +1,9 @@
+//
+//  MainScreen
+//
+//  This is the first screen that the user sees.  It allows the user to enter a search term, then passes the 
+//  term to ProductsScreen to kick off a search.
+
 
 function MainScreen() {
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
@@ -35,6 +41,7 @@ function MainScreen() {
 		top:10
 	})
 	
+	// Upoon submit, forward to the ProductsScreen with the textBox value as query to execute
     var ProductsScreen = require("ui/handheld/ProductsScreen");
 	submit.addEventListener("click", function(){
 		var productsScreen = new ProductsScreen(textBox.value);
