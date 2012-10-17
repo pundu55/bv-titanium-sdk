@@ -124,7 +124,7 @@ function FormScreen(imData) {
 	function submitReview() {
 		BV.submitReview().withTitle(title.value).withPhoto(photoUploadUrl).withUserId('craiggil').withProductId('12345').withRating(stars.rating).withUserNickname(nickname.value).withReviewText(reviewText.value).withAction("preview").send({
 			success : handleFormSubmission,
-			error : formScreen.handleFormSubmission
+			error : onError
 		});
 	}
 
@@ -136,6 +136,12 @@ function FormScreen(imData) {
 		formScreen.nav.closeWindow(formScreen, false);
 		formScreen.nav.pushWindow(completionScreen);		
 	}
+	
+	function onError(data) {
+		alert("An Error Occurred");
+		formScreen.nav.closeWindow(formScreen, false);
+	}
+
 
 	formScreen.handlePhotoData = function(data) {
 		photoUploadUrl = data.Photo.Sizes.normal.Url;

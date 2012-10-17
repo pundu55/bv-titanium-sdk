@@ -79,7 +79,7 @@ function ProductScreen() {
 		var formScreen = new FormScreen(blob);
 		formScreen.nav = productScreen.nav;
 		
-		BV.uploadPhoto().withContentType('review').withUserId('craiggil').withPhoto(blob).send({success: formScreen.handlePhotoData, error: formScreen.handlePhotoData});;
+		BV.uploadPhoto().withContentType('review').withUserId('craiggil').withPhoto(blob).send({success: formScreen.handlePhotoData, error: formScreen.onError});;
 		productScreen.nav.pushWindow(formScreen);
 	}
 
