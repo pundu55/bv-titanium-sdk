@@ -1,6 +1,6 @@
 function ProductsScreen(query) {
 	var response;
-	
+
 	Ti.include("/lib/colors.js");
 
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
@@ -10,7 +10,7 @@ function ProductsScreen(query) {
 	var table = Titanium.UI.createTableView({
 		width : "100%",
 		height : "100%",
-		top: 5
+		top : 5
 	});
 
 	mainView.add(table);
@@ -24,16 +24,20 @@ function ProductsScreen(query) {
 	});
 	BV.products().withStatsOn("reviews").search(query).include("reviews").send({
 		success : handleData,
-		error : handleData
+		error : onError
 	});
 
-    var DetailScreen = require("ui/handheld/DetailScreen");
+	var DetailScreen = require("ui/handheld/DetailScreen");
 	table.addEventListener('click', function(e) {
 		var product = response.Results[e.index];
 		var detailScreen = new DetailScreen(product, response.Includes.Reviews);
 		detailScreen.nav = productsScreen.nav;
 		productsScreen.nav.pushWindow(detailScreen);
 	});
+
+	function onError(data) {
+		alert("An Error Occurred");
+	}
 
 	function handleData(data) {
 		response = data;
@@ -106,4 +110,4 @@ function ProductsScreen(query) {
 	return productsScreen;
 };
 
-module.exports = ProductsScreen; 
+module.exports = ProductsScreen;
