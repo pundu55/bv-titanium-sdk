@@ -27,3 +27,4 @@ Logfile initialized
 [ERROR]   File "/System/Library/Frameworks/Python.framework/Versions/2.7/lib/python2.7/shutil.py", line 81, in copyfile
 [ERROR]     with open(src, 'rb') as fsrc:
 [ERROR] IOError: [Errno 2] No such file or directory: u'/Users/alex.medearis/Desktop/bv-titanium-sdk/BrowseProductsExample/build/android/bin/assets/Resources/appicon.png'
+[INFO] Android Emulator has exited

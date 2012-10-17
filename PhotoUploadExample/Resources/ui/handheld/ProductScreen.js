@@ -1,3 +1,8 @@
+//
+//  ProductScreen
+//
+//  ProductScreen for displaying the (fixed) product and kicking off the camera 
+
 var BV = require("lib/bv-js-sdk");
 	BV.config({
 		baseUrl : "http://reviews.apitestcustomer.bazaarvoice.com/bvstaging/data/",
