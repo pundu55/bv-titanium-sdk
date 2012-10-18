@@ -24,6 +24,8 @@ function showLoadingOverlay(win) {
 	loadView.add(loadIndicator);
 	
 	win.add(loadView);
+	
+	loadIndicator.show();
 }
 
 function FormScreen(imData) {
@@ -67,6 +69,7 @@ function FormScreen(imData) {
 
 	var stars = Stars.createStars({
 		top : 0,
+		left: 5,
 		width : "100%",
 		height : "20%",
 		rating : 2,
