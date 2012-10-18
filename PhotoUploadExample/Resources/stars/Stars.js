@@ -10,7 +10,8 @@ function createStars(args) {
 		top : args.top,
 		width : args.width,
 		height : args.height,
-		layout : 'horizontal'
+		layout : 'horizontal',
+		left: args.left ? args.left : 0
 	});
 	view.rating = args.rating;
 
