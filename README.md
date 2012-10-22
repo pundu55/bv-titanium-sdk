@@ -26,6 +26,6 @@ This package includes the following:
 * Titanium Mobile SDK based on Bazaarvoice Developer API
 * Quick Start Guide - Quickly get familiar with installation and building a bare-bones, simple application that uses the SDK
 * Reference applications
- * Product browse example: Illustrates using the Bazaarvoice iOS SDK to query, browse and display ratings and reviews for products
- * Photo upload example: Illustrates using the Bazaarvoice iOS SDK to submit a photo-review that include a user generated photo (camera/gallery), star rating and review text.
+ * Product browse example: Illustrates using the Bazaarvoice Titanium Mobile SDK to query, browse and display ratings and reviews for products
+ * Photo upload example: Illustrates using the Bazaarvoice Titanium Mobile SDK to submit a photo-review that include a user generated photo (camera/gallery), star rating and review text.
  * “Kitchen Sink” app: Covers all the baseline method calls and their responses. It’s a good way for developers see the all the requests and responses of the SDK out of the box.
