@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">define([
+  'api/api',
+  'api/submit',
+  'api/normalizer',
+], function (api, submit, normalizer) {
+
+  var client = submit || api;
+
+  client.normalize = function (data, opts) {
+    return normalizer.normalize(data, opts);
+  };
+
+  function getXMLHttpRequest() 
+  {
+      if (window.XMLHttpRequest) {
+          return new window.XMLHttpRequest;
+      }
+      else {
+          try {
+              return new ActiveXObject('Microsoft.XMLHTTP');
+          }
+          catch(ex) {
+              return null;
+          }
+      }
+  }
+
+  function onSuccess( data, options ) {
+    if (client._config.normalize) {
+      data = client.normalize(data, { contentType : self._data.contentType });
+    }
+
+    if (options &amp;&amp; options.success) {
+      return options.success(data);
+    } 
+    else {
+      client.warn('No success callback supplied: ', data);
+    }
+  }
+
+  function onError( data, options ) {
+    if (options &amp;&amp; options.error) {
+      return options.error(data);
+    }
+    else { 
+      client.warn('No error callback supplied: ', data);
+    }
+  }
+  
+<span id='BV-api-get-method-send'>  /**
+</span>  * @method send
+  * @member BV.api.get
+  * 
+  * This function mimics on jQuery's $.ajax functionality. This calls
+  * into `serialize` and then actually makes the request. The function
+  * returns the `jqXHR` object that jQuery returns. This is a deferred
+  * based system, so calling `done` and `fail` on it will be the way
+  * that you get the response.
+  *
+  * This tries to handle normalization turned on or off, as well as some  
+  * initial caching efforts.
+  * 
+  * @param {Object} options
+  */
+  client.get.fn.send = function  ( options ) {
+    var self = this,
+      getUrl = self.serialize(),
+      xhr = getXMLHttpRequest();
+
+      if (xhr != null) {
+        xhr.open(&quot;GET&quot;, getUrl, true);
+        xhr.onreadystatechange = function handler ( options) {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+              onSuccess ( xhr.responseText, options);
+            } else {
+              onError ( xhr.responseText, options);
+            } 
+          }
+        };
+        xhr.ontimeout = onError;
+        xhr.send();
+    }
+    else {
+      client.warn(&quot;AJAX (XMLHTTP) not supported.&quot;);
+    }
+  };
+
+<span id='BV-api-submit-method-send'>  /**
+</span>  * @method send
+  * @member BV.api.submit
+  * 
+  * This function mimics on jQuery's $.ajax functionality. This calls
+  * into `serialize` and then actually makes the request. The function
+  * returns the `jqXHR` object that jQuery returns. This is a deferred
+  * based system, so calling `done` and `fail` on it will be the way
+  * that you get the response.
+  *
+  * This tries to handle normalization turned on or off, as well as some  
+  * initial caching efforts.
+  * 
+  * @param {Object} options
+  */
+  client.submit.fn.send = function  ( options ) {
+    var self = this,
+      postUrl = self.getHierarchialPartString(),
+      postData = self.getQueryString(),
+      xhr = getXMLHttpRequest();
+
+    if (xhr != null) {
+        xhr.open(&quot;POST&quot;, postUrl, true);
+        xhr.setRequestHeader(&quot;Content-type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+        xhr.onreadystatechange = function handler ( options) {
+          if (xhr.readyState == 4) {
+            if (xhr.status == 200) {
+              onSuccess ( xhr.responseText, options);
+            } else {
+              onError ( xhr.responseText, options);
+            } 
+          }
+        };
+        xhr.ontimeout = onError;
+        xhr.send(postData);
+    } 
+    else {
+        client.warn(&quot;AJAX (XMLHTTP) not supported.&quot;);
+    }
+  };
+
+  return client;
+});
+</pre>
+</body>
+</html>
