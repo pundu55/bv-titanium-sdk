@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">define([
+  'api/api',
+  'api/submit',
+  'api/normalizer',
+], function (api, submit, normalizer) {
+
+  var client = submit || api;
+
+  client.normalize = function (data, opts) {
+    return normalizer.normalize(data, opts);
+  };
+
+  function onSuccess( data, options ) {
+    if (client._config.normalize) {
+      data = client.normalize(data, { contentType : self._data.contentType });
+    }
+
+    if (options &amp;&amp; options.success) {
+      return options.success(data);
+    } 
+    else {
+      client.warn('No success callback supplied: ', data);
+    }
+  }
+
+  function onError( data, options ) {
+    if (options &amp;&amp; options.error) {
+      return options.error(e, data);
+    }
+    else { 
+      client.warn('No error callback supplied: ', data);
+    }
+  }
+  
+  // ## `send` GET
+  //
+  // This function relies on jQuery's $.ajax functionality. This calls
+  // into `serialize` and then actually makes the request. The function
+  // returns the `jqXHR` object that jQuery returns. This is a deferred
+  // based system, so calling `done` and `fail` on it will be the way
+  // that you get the response.
+  //
+  // This tries to handle normalization turned on or off, as well as some
+  // initial caching efforts.
+  //
+  client.get.fn.send = function  ( options ) {
+    var self = this,
+      getUrl = self.serialize(),
+      xhr;
+
+    if (Titanium &amp;&amp; Titanium.Network) {
+
+      xhr = Titanium.Network.createHTTPClient();
+      xhr.onload = function() {
+        onSuccess(JSON.parse(this.responseText), options);
+      };
+      xhr.onerror = function(e) {
+        client.warn(&quot;ERROR!&quot;, e.error);
+        onError(JSON.parse(this.responseText), options);
+      };
+      xhr.open(&quot;GET&quot;, getUrl);;
+      xhr.send();
+
+    }
+    else {
+      client.warn(&quot;Titanium not found&quot;);
+    }
+  };
+
+  client.submit.fn.send = function  ( options ) {
+    var self = this,
+      postUrl = self.getHierarchialPartString(),
+      postData = self.getParamsHash(),
+      xhr;
+
+    if (Titanium &amp;&amp; Titanium.Network) {
+
+      xhr = Titanium.Network.createHTTPClient();
+      xhr.onload = function() {
+        onSuccess(JSON.parse(this.responseText), options);
+      };
+      xhr.onerror = function(e) {
+        client.warn(&quot;ERROR!&quot;, e.error);
+        onError(JSON.parse(this.responseText), options);
+      };
+      xhr.open(&quot;POST&quot;,postUrl);
+      xhr.setRequestHeader(&quot;Content-Type&quot;, &quot;application/x-www-form-urlencoded&quot;);
+      xhr.send(postData);
+        
+    } 
+    else {
+        client.warn(&quot;Titanium not found.&quot;);
+    }
+  };
+
+  return client;
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*jshint laxcomma:true*/
+
+define(['underscore'], function (_) {
+  var includables = [
+    ['Author',   'Authors'],
+    ['Comment',  'Comments'],
+    ['Product',  'Products'],
+    ['Category', 'Categories']
+  ],
+  statTypes = [ 'ReviewStatistics', 'QuestionStatistics', 'AnswerStatistics', 'StoryStatistics'],
+  orderables = ['SecondaryRatings', 'ContextDataValues', 'TagDimensions', 'Badges'],
+  typeMap = {
+    reviewstatistics : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;reviewstatistics&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;FeaturedReviewCount&quot;,
+          to   : &quot;FeaturedCount&quot;
+        },
+        {
+          from : &quot;TotalReviewCount&quot;,
+          to   : &quot;TotalCount&quot;
+        },
+        {
+          from : &quot;RatingsOnlyReviewCount&quot;,
+          to   : &quot;RatingsOnlyCount&quot;
+        }
+      ],
+      sum : [
+        {
+          add1 : &quot;NotRecommendedCount&quot;,
+          add2 : &quot;RecommendedCount&quot;,
+          sum  : &quot;TotalRecommendedCount&quot;
+        },
+        {
+          add1 : &quot;HelpfulVoteCount&quot;,
+          add2 : &quot;NotHelpfulVoteCount&quot;,
+          sum  : &quot;TotalHelpfulVoteCount&quot;
+        }
+      ],
+      ensure : [
+        {
+          firstKey : 'RatingDistribution',
+          secondKey : 'RatingValue',
+          defaultTo : [
+            {
+              Count: 0,
+              RatingValue: 1
+            },
+            {
+              Count: 0,
+              RatingValue: 2
+            },
+            {
+              Count: 0,
+              RatingValue: 3
+            },
+            {
+              Count: 0,
+              RatingValue: 4
+            },
+            {
+              Count: 0,
+              RatingValue: 5
+            }
+          ]
+        }
+      ]
+    },
+    questionstatistics : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;questionstatistics&quot;
+        }
+      ],
+      change : [
+        {
+          from: &quot;HelpfulVoteCount&quot;,
+          to: &quot;DELETEME&quot;
+        },
+        {
+          from : &quot;FeaturedQuestionCount&quot;,
+          to   : &quot;FeaturedCount&quot;
+        },
+        {
+          from : &quot;TotalQuestionCount&quot;,
+          to   : &quot;TotalCount&quot;
+        },
+        {
+          from : &quot;FirstQuestionTime&quot;,
+          to   : &quot;FirstSubmissionTime&quot;
+        },
+        {
+          from : &quot;LastQuestionTime&quot;,
+          to   : &quot;LastSubmissionTime&quot;
+        },
+        {
+          from : &quot;QuestionHelpfulVoteCount&quot;,
+          to   : &quot;HelpfulVoteCount&quot;
+        },
+        {
+          from : &quot;QuestionNotHelpfulVoteCount&quot;,
+          to   : &quot;NotHelpfulVoteCount&quot;
+        }
+      ],
+      remove: [
+        'DELETEME',
+        'FirstAnswerTime',
+        'LastAnswerTime',
+        'AnswerHelpfulVoteCount',
+        'AnswerNotHelpfulVoteCount',
+        'FeaturedAnswerCount',
+        'TotalAnswerCount',
+        'BestAnswerCount'
+      ]
+    },
+    answerstatistics : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;answerstatistics&quot;
+        }
+      ],
+      change : [
+        {
+          from: &quot;HelpfulVoteCount&quot;,
+          to: &quot;DELETEME&quot;
+        },
+        {
+          from : &quot;FeaturedAnswerCount&quot;,
+          to   : &quot;FeaturedCount&quot;
+        },
+        {
+          from : &quot;TotalAnswerCount&quot;,
+          to   : &quot;TotalCount&quot;
+        },
+        {
+          from : &quot;FirstAnswerTime&quot;,
+          to   : &quot;FirstSubmissionTime&quot;
+        },
+        {
+          from : &quot;LastAnswerTime&quot;,
+          to   : &quot;LastSubmissionTime&quot;
+        },
+        {
+          from : &quot;AnswerHelpfulVoteCount&quot;,
+          to   : &quot;HelpfulVoteCount&quot;
+        },
+        {
+          from : &quot;AnswerNotHelpfulVoteCount&quot;,
+          to   : &quot;NotHelpfulVoteCount&quot;
+        },
+        {
+          from : &quot;BestAnswerCount&quot;,
+          to   : &quot;BestCount&quot;
+        }
+      ],
+      remove: [
+        'DELETEME',
+        'FirstQuestionTime',
+        'LastQuestionTime',
+        'QuestionHelpfulVoteCount',
+        'QuestionNotHelpfulVoteCount',
+        'FeaturedQuestionCount',
+        'TotalQuestionCount',
+        'LastQuestionAnswerTime'
+      ]
+    },
+    products : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;product&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;ProductPageUrl&quot;,
+          to   : &quot;Url&quot;
+        }
+      ],
+      copy : [
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;QuestionStatistics&quot;
+        },
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;AnswerStatistics&quot;
+        }
+      ],
+      ensure: [
+        {
+          firstKey  : &quot;TotalReviewCount&quot;,
+          defaultTo : 0
+        }
+      ]
+    },
+    users : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;user&quot;
+        }
+      ],
+      copy : [
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;QuestionStatistics&quot;
+        },
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;AnswerStatistics&quot;
+        }
+      ],
+      remove : [
+        &quot;QAStatistics&quot;
+      ]
+    },
+    categories : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;category&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;CategoryPageUrl&quot;,
+          to   : &quot;Url&quot;
+        }
+      ],
+      copy : [
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;QuestionStatistics&quot;
+        },
+        {
+          from : &quot;QAStatistics&quot;,
+          to   : &quot;AnswerStatistics&quot;
+        }
+      ]
+    },
+    reviews : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;review&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;ReviewText&quot;,
+          to   : &quot;Text&quot;
+        },
+        {
+          from : &quot;ProductId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;Product&quot;,
+          to   : &quot;Reference&quot;
+        }
+      ],
+      copy : [],
+      remove : [
+        'Pros',
+        'Cons',
+        'UserNickname'
+      ],
+      merge : [
+        {
+          &quot;into&quot; : &quot;Author.DisplayName&quot;,
+          &quot;first&quot; : &quot;Author.DisplayName&quot;,
+          &quot;second&quot; : &quot;UserNickname&quot;
+        }
+      ]
+    },
+    questions : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;question&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;CategoryId&quot;,
+          to   : &quot;ReferenceId&quot;,
+          ifValueExists  : true
+        },
+        {
+          from : &quot;Category&quot;,
+          to   : &quot;Reference&quot;
+        },
+        {
+          from : &quot;ProductId&quot;,
+          to   : &quot;ReferenceId&quot;,
+          ifValueExists  : true
+        },
+        {
+          from : &quot;Product&quot;,
+          to   : &quot;Reference&quot;
+        },
+        {
+          from : &quot;QuestionSummary&quot;,
+          to   : &quot;Text&quot;
+        }
+      ]
+    },
+    answers : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;answer&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;QuestionId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;AnswerText&quot;,
+          to   : &quot;Text&quot;
+        }
+      ]
+    },
+    stories : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;story&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;CategoryId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;ProductId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;StoryText&quot;,
+          to   : &quot;Text&quot;
+        }
+      ]
+    },
+    comments : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;comment&quot;
+        }
+      ],
+      change : [
+        {
+          from : &quot;ReviewId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;StoryId&quot;,
+          to   : &quot;ReferenceId&quot;
+        },
+        {
+          from : &quot;CommentText&quot;,
+          to   : &quot;Text&quot;
+        }
+      ]
+    },
+    clientreponses : {
+      add : [
+        {
+          key : &quot;ContentType&quot;,
+          val : &quot;response&quot;
+        }
+      ]
+    }
+  },
+  synonyms = {
+    product: &quot;products&quot;,
+    category: &quot;categories&quot;,
+    author: &quot;users&quot;
+  },
+  actions = [
+    newAction( &quot;change&quot;,
+      function ( map, item ) {
+        if ( ( map.from in item ) &amp;&amp; ( item.hasOwnProperty( map.from ) ) ) {
+          if ( map.ifValueExists &amp;&amp; !item[ map.from ] ) {
+            return;
+          }
+          item[ map.to ] = item[ map.from ];
+          delete item[ map.from ];
+        }
+      },
+      { from: 'required', to: 'required', ifValueExists: 'optional' }
+    ),
+
+    newAction( &quot;add&quot;,
+      function ( map, item ) {
+        item[ map.key ] = map.val;
+      },
+      { key: 'required', val: 'required' }
+    ),
+
+    newAction( &quot;sum&quot;,
+      function ( map, item ) {
+        item[ map.sum ] = item[ map.add1 ] + item[ map.add2 ];
+      },
+      { add1: 'required', add2: 'required', sum: 'required' }
+    ),
+
+    newAction( &quot;copy&quot;,
+      function ( map, item, todoList ) {
+        if ( map.from in item ) {
+          var value = _( item[ map.from ] ).clone();
+          item[ map.to ] = value;
+          todoList.push( value, map.to );
+        }
+      },
+      { from: 'required', to: 'required' }
+    ),
+
+    newAction( &quot;clone&quot;,
+      function ( map, item ) {
+        if ( map.from in item ) {
+          item[ map.to ] = item[ map.from ];
+        }
+      },
+      { from: 'required', to: 'required' }
+    ),
+
+    newAction( &quot;ensure&quot;, function ( map, item ) {
+      var targetPath = map.firstKey.split('.');
+      var targetItem = item;
+      var intoKey;
+      // This one must create non-existing paths
+      _(targetPath).forEach(function (key, i) {
+        if ( i &lt; targetPath.length - 1 ) {
+          if ( targetItem[key] ) {
+            targetItem = targetItem[key];
+          }
+          else {
+            targetItem[key] = {};
+            targetItem = targetItem[key];
+          }
+        }
+        else {
+          intoKey = key;
+        }
+      });
+      if (!map.secondKey) {
+        if (!targetItem[intoKey]) {
+          targetItem[intoKey] = map.defaultTo;
+        }
+      }
+      else {
+        var matchKey = map.secondKey;
+        var current = targetItem[intoKey];
+        var exists = _(current).pluck(matchKey);
+        var toAdd = _(map.defaultTo).filter(function (obj) {
+          return !_(exists).include(obj[matchKey]);
+        });
+
+        var result = _.union(toAdd, current);
+        targetItem[intoKey] = _(result).sortBy(function (obj) { return obj[matchKey]; });
+     }
+
+    }, { firstKey: 'required', defaultTo: 'required' }),
+
+    newAction('merge', function (map, item) {
+      var intoParts = map.into.split('.');
+      var firstParts = map.first.split('.');
+      var secondParts = map.second.split('.');
+
+      var intoItem = item;
+      var intoKey;
+      var firstItem = item;
+      var secondItem = item;
+
+      // This one must create non-existing paths
+      _(intoParts).forEach(function (key, i) {
+        if ( i &lt; intoParts.length - 1 ) {
+          if ( intoItem[key] ) {
+            intoItem = intoItem[key];
+          }
+          else {
+            intoItem[key] = {};
+            intoItem = intoItem[key];
+          }
+        }
+        else {
+          intoKey = key;
+        }
+      });
+
+      _(firstParts).forEach(function ( key ) {
+        if ( firstItem ) {
+          firstItem = firstItem[ key ];
+        }
+      });
+
+      if (firstItem) {
+        intoItem[intoKey] = firstItem;
+      }
+      else {
+        _(secondParts).forEach(function ( key ) {
+          if ( secondItem ) {
+            secondItem = secondItem[ key ];
+          }
+        });
+
+        if (secondItem) {
+          intoItem[intoKey] = secondItem;
+        }
+      }
+    },  { into: 'required', first: 'required' }),
+
+    newAction( &quot;remove&quot;,
+      function ( map, item ) {
+        delete item[ map ];
+      },
+      []
+    )];
+
+  function newAction ( name, fn, sample ) {
+    fn.nme = name;
+    fn.sample = sample;
+    return fn;
+  }
+
+  function inlineIds ( type, list, included ) {
+    _( list ).forEach(function( item ){
+      // Handle blanks once
+      if ( ! item || ! included ){
+        return list;
+      }
+
+      // Grab a product id
+      if ( item[ type + 'Id' ] ) {
+        // Add that product to the item
+        item[ type ] = included[ item[ type + 'Id' ] ];
+      }
+      // Grab answer ids
+      else if ( item[ type + 'Ids'] ) {
+        var includes = [];
+        _.forEach( item[ type + 'Ids' ], function (item) {
+            includes.push(included[item]);
+        });
+        item[ type + 's' ] = includes;
+      }
+    });
+    // Return the list with the products now inlined.
+    return list;
+  }
+
+  function inlineOrdered ( list ) {
+    // Go through each result item
+    _( list ).forEach(function ( base ){
+      // Go through each orderable type
+      _( orderables ).forEach(function ( name ) {
+        // If it exists on the current item
+        if ( base[ name + 'Order' ] &amp;&amp; base[ name + 'Order' ].length ) {
+          base[ name + 'Ordered' ] = [];
+          _( base[ name + 'Order' ] ).forEach(function ( key ) {
+            // TODO :: make sure the Id is included so we don't lose it, currently
+            // it usually is though.
+            base[ name + 'Ordered' ].push( base[ name ][ key ] );
+          });
+        }
+      });
+    });
+    return list;
+  }
+
+  function clearEmpty ( list ) {
+    // Go through every base property replace empty array/object values with nulls
+    // TODO :: maybe just override the handlebars 'if' helper so it denies an
+    // empty object.
+    _( list ).forEach(function(data, key){
+      if ( _.isObject( data ) &amp;&amp; _.isEmpty( data ) ) {
+        list[ key ] = null;
+        return;
+      }
+
+      // Go two deep if it's an object
+      // TODO :: figure out a way to go deeper (unlikely), without hitting an infinite
+      // loop with circular refs.
+      if ( _.isObject( data ) ) {
+        _( data ).forEach(function (d2, k2){
+          if ( _.isObject( d2 ) &amp;&amp; _.isEmpty( d2 ) ) {
+            data[k2] = null;
+          }
+        });
+      }
+    });
+
+    return list;
+  }
+
+  // TODO: figure out why it's not removing CategoryId (if that's important)
+  function modDeep ( list, type ) {
+
+    var todoList;
+
+    // Bail if we don't know the type
+    if ( ! type ) {
+      return list;
+    }
+
+    // Convert to lowercase for ease
+    type = type.toLowerCase();
+
+    // Bail if we haven't defined any keys for this
+    if ( ! typeMap[ type ] ) {
+      return list;
+    }
+
+    if ( _.isArray( list ) ) {
+      _( list ).each(function ( item ) {
+        if ( item ) {
+          modDeep( item, type );
+        }
+      });
+    }
+    else {    // it's a non-array object
+      // make a copy to maintain original key names
+      // for content type in sub-entity normalization
+      todoList = newTodoList( list );
+
+      // normalize each key name and value in the input
+      _( actions ).each(function( fn ) {
+        _( typeMap[ type ][ fn.nme ] ).forEach(function ( map ) {
+          fn( map, list, todoList );
+        });
+      });
+
+      // normalize each non-array object sub-entity
+      todoList.each(function( entity, contentType ) {
+        modDeep( entity, contentType );
+      });
+    }
+
+    return list;
+  }
+
+  function newTodoList ( object ) {
+    var todoData = [],
+        todoList;
+
+    function getContentType ( keyName ) {
+      var contentType = keyName.toLowerCase();
+      contentType = synonyms[ contentType ] || contentType;
+      return contentType;
+    }
+
+    todoList = {
+      push: function ( value, key ) {
+        if ( !value || (typeof value != 'object') ) {
+          return this;
+        }
+        var contentType = getContentType( key );
+        if ( !typeMap[ contentType ] ) {
+          return this;
+        }
+        todoData.push(
+          {
+            contentType: contentType,
+            entity: value
+          }
+        );
+        return this;
+      },
+      each: function ( fn ) {
+        _( todoData ).each(function( todoItem ) {
+          fn( todoItem.entity, todoItem.contentType );
+        });
+        return this;
+      }
+    };
+
+    // push all
+    _( object ).each(function ( value, key ) {
+      todoList.push( value, key );
+    });
+    return todoList;
+  }
+
+  return {
+
+    // ## 'normalize'
+    // transforms entity type specific input JSON, as from the BV API, into JSON
+    // that can be accessed generically instead of using keys specific to content type.
+    // also performs inlining operations to make each data component more available
+    // from all parts of the objects. in addition, removes all empty arrays and objects
+    // from output, replacing with nulls.
+    //
+    // Performs inlining (on the results and the includes):
+    // - inserts entity from the includes section where an id exists
+    // - changes all values that are empty objects or arrays to the value null
+    // - inserts an ordered array for entities that have an order specification (such as 'SecondaryRatings', 'ContextDataValues', 'TagDimensions', 'Badges')
+    //
+    // Performs normalization of keys:
+    // - changes entity-specific keys into generic keys that can be used in duck typing
+    // - inserts ContentType attribute for each entity (review, question, answer, category, product, etc.)
+    // - removes some deprecated keys
+    //
+    // legal options:
+    // - contentType: (string) the expected content type of inRaw argument. used for transformation.
+    // - disableUniversal: (boolean) if truthy, only inlining and empty removal performed, no content transforms.
+    normalize : function ( inRaw, options ) {
+      if ( ! inRaw ) {
+        // TODO :: probably throw error in this case.
+        return [];
+      }
+      // Options merge
+      options = _.extend({}, options);
+
+      // Don't modify the original, just in case
+      // someone is relying on it.
+      var raw     = _.clone( inRaw ),
+          results = raw.Results;
+
+      // If this is a submission, schema, just return the raw data
+      // TODO - normalize submission
+      if (raw.Form) {
+        return raw;
+      }
+
+      // Then inline the correct data:
+      // Includes inlining
+      if ( raw.Includes ) {
+        // Inline each &quot;Includable&quot; type
+        _( includables ).forEach(function ( typePair ) {
+          // Grab each of these out of the includes and add in their sub includes
+          // Only need to do one level of these
+          _( includables ).forEach(function ( innerTypePair ) {
+            if ( raw.Includes[ typePair[1] ] ) {
+              // Do all the main  normalizations on the includes first
+              raw.Includes[ typePair[1] ] = inlineIds( innerTypePair[0], raw.Includes[ typePair[1] ], raw.Includes[ innerTypePair[1] ] );
+              raw.Includes[ typePair[1] ] = clearEmpty( raw.Includes[ typePair[1] ] );
+              raw.Includes[ typePair[1] ] = inlineOrdered( raw.Includes[ typePair[1] ] );
+            }
+          });
+
+          // Grab these out of includes and put them into the results
+          results = inlineIds( typePair[0], results, raw.Includes[ typePair[1] ] );
+        });
+      }
+
+      results = inlineOrdered( results );
+      // Clear out empty keys for ease of templating
+      results = clearEmpty( results );
+
+      // Do the Universal Content Type stuff:
+      if ( ! options.disableUniversal ) {
+        results = modDeep( results, ( options.contentType || &quot;&quot; ).toLowerCase() );
+      }
+
+      return {
+        TotalResults : raw.TotalResults,
+        Results: results
+      };
+    }
+
+    // NF: JSHint does not like this, but necessary so that pragma doesn't result in invalid code
+    //&gt;&gt;excludeStart('excludeForBVTesting', pragmas.excludeForBVTesting)
+    ,
+    getInternalsForTestingUseOnly: function () {
+      return {
+        typeMap: typeMap,
+        synonyms: synonyms,
+        actions: actions
+      };
+    }
+    //&gt;&gt;excludeEnd('excludeForBVTesting')
+  };
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*
+* BV API Display URL builder - JavaScript
+* Depends on:
+*   underscore &gt;= 1.2.3
+*
+* MIT License
+* @version 0.1.0 beta
+* @bvapiversion &gt;= 5.0
+*/
+define(['underscore', 'util/checksum'], function (_, checksum) {
+  var global = this,
+
+<span id='BV-api-get'>  /**
+</span>  * @class BV.api.get
+  * @extends BV.api
+  * Display url API object
+  */
+  client = {
+    // This is a default configuration
+    _config: {
+      // The return format (extension)
+      format      : 'json',
+      // Change the data up to be all together
+      normalize   : false,
+      // The api version
+      apiversion  : '5.3',
+      // The date object to do sorts and filters against
+      timeKey     : 'LastModeratedTime',
+      // Base hierarchial part of the BV api
+      baseUrl     : 'http://reviews.apitestcustomer.bazaarvoice.com/bvstaging/data/',
+      // API passkey
+      passkey     : '3d9fiq4371xcuvt7sjsqdy9ki'
+    }
+  },
+  // These are the mappings for common operators to our api keys for the same things
+  logicalKeys = {
+    '&gt;'  : 'gt',
+    '&gt;=' : 'gte',
+    '&lt;'  : 'lt',
+    '&lt;=' : 'lte',
+    '='  : 'eq',
+    '!=' : 'neq'
+  },
+  // The translation for ascending and descending in sorts
+  dirKeys = {
+    '+' : 'asc',
+    '-' : 'desc'
+  },
+  // This is a list of our types in singular and plural.
+  // The third string is for it's sugar filter helper and it defaults to 'for'.
+  typePairs  = [
+    ['review',   'reviews', 'with'], // from?
+    ['question', 'questions'],
+    ['answer',   'answers' ],
+    ['story',    'stories'],
+    ['comment',  'comments', 'with'],
+    ['author',  'authors', 'from'],
+    ['photo',    'photos', 'with'],
+    ['video',    'videos', 'with'],
+    ['product',  'products'],
+    ['category', 'categories', 'in']
+  ],
+<span id='BV-api-method-get'>  /**
+</span>  * @method get
+  * @member BV.api
+  *
+  * This function kicks things off. It uses the jQuery pattern of calling a prototype 
+  * to actually kick off a new instance. The `new` keyword creates a new instance scope so 
+  * all the data called on it after a `get` call and it's aliases won't affect other queries.
+  *
+  * @param {String} displayContentType the content type that is being displayed
+  * @param {String | Array} idList the list of ids to filter by for display content type
+  * @return {Object} display object for chaining
+  * @chainable
+  */
+  get = function ( displayContentType, idList ) {
+    return new get.fn.init( displayContentType, idList );
+  },
+  // These functions are the set that are returned for subqueries.
+  // Most of them have to be distinctly different than the core functions
+  // because they are built in different ways in the end, so the data is
+  // stored accordingly.
+  subquerySet = {
+    // ## Subquery: `offset`
+    // Sets the `offset_&lt;type&gt;` key in the request
+    // does not take multiple values. The last one wins.
+    offset : function ( num ) {
+      this.mods.offset = num;
+      return this;
+    },
+    // ## Subquery: `limit`
+    // Much like offset, this sets `limit_&lt;type&gt;` in the request
+    // Last value wins.
+    limit : function ( num ) {
+      this.mods.limit = num;
+      return this;
+    },
+    // ## Subquery: 'search'
+    // Much like offeset, this sets `search_&lt;type&gt;` in the request
+    // Last value wins.
+    search : function ( search_text ) {
+      this.mods.search = search_text;
+      return this;
+    },
+    // ## Subquery: `sortBy`
+    // This `sortBy` sorts the subtype. So it affects the
+    // `sort_&lt;type&gt;` value. It takes a direction (`asc` || `desc`)
+    // as shorthand ( `+` || `-` ) or longhand. Then it takes the
+    // key to sort by (like rating or something). The direction
+    // is optional if you only send in one param it defaults to
+    // descending.
+    sortBy : function ( dir, key ) {
+      // Support descending by default
+      // Check for undefined because we sometimes send in
+      // null values, unfortunately. We want it unset.
+      if ( typeof key == 'undefined' ) {
+        key = dir;
+        dir = &quot;desc&quot;;
+      }
+      // Add this onto the list of sorts (which is ordered).
+      // Make everything lowercase as convention and so groupings
+      // happen more easily.
+      this.mods.sorts.push({
+        dir : (''+dir).toLowerCase(),
+        key : (''+key).toLowerCase()
+      });
+      // All occurences of `return this` probably mean we're chaining.
+      // Don't be annoyed if I don't write this every time.
+      return this;
+    },
+    // ## Subquery: `filterBy`
+    // The subquery `filterBy` affects the `filter_&lt;type&gt;` variable and
+    // does the proper grouping based on the key and the operator.
+    // e.g. `rating &gt; 3`, `rating &gt; 4` result in a single `filter_&lt;type&gt;=rating:gt:3,4`
+    //
+    // If you pass in one value, assume it's a boolean, and you want it to equal `true`
+    // If you pass in two values, assume that you want them to be equal
+    filterBy : function ( key, operator, value ) {
+      // Implicit boolean for a single parameter
+      if ( typeof operator == 'undefined' &amp;&amp; typeof value == 'undefined' ) {
+        operator = '=';
+        // This ends up as a string, so we might as well oblige.
+        value    = 'true';
+      }
+       // Implicit `=` - for two parameters
+      else if ( typeof value == 'undefined' ) {
+        value = operator;
+        operator = '=';
+      }
+
+      // Add this filter to the sublist
+      this.mods.filters.push({
+        key      : (''+key).toLowerCase(),
+        operator : (''+operator).toLowerCase(),
+        value    : (''+value).toLowerCase()
+      });
+
+      return this;
+    },
+
+<span id='BV-api-get-method-end'>    /**
+</span>    * @method end
+    *
+    * This function breaks you out of a subQuery. It is necessary if you use the 
+    * subQuery syntax : a chained `.get()` call.
+    * @return {Object}  api object for chaining
+    * @chainable
+    */
+    end : function () {
+      // Call this function again in the declarative way, in the correct
+      // context;
+      return this.self._get.call( this.self, this.type, this.mods );
+    }
+  };
+
+  // Static functions on the client.
+  // These are the ones that exist before you call a `.get` (so not on
+  // the prototype). Basic stuff.
+  _.extend( client, {
+    // ## `get`
+    // The `get` call is a call to `init` with sugar.
+    get : get,
+
+<span id='BV-api-method-config'>    /**
+</span>    * @member BV.api
+    * A configuration function that mixes in config for each call.
+    *
+    * @param {Object} configObj
+    * @return {Object} api object for chaining
+    */
+    config : function ( configObj ) {
+      // Use the extend pattern, so we don't lose old stuff.
+      // Override entirely with the &quot;undocumented&quot; client._config object.
+      client._config = _.extend( client._config, configObj );
+      return this;
+    },
+
+<span id='BV-api-method-warn'>    /**
+</span>    * @member BV.api
+    * A consistent way to do warnings, only runs if the console is available.
+    *
+    * @param {String} msg
+    * @param {Object} data
+    * @return {Object} api object for chaining
+    */
+    warn : function ( msg, data ) {
+      // Make sure console logging is possible
+      if ( global.console &amp;&amp; global.console.log ) {
+        // Log out the message and data
+        global.console.log( 'BV API JS lib warning: ' + msg, data );
+      }
+    }
+
+  });
+
+<span id='BV-api-get-method-__REPLACE_WITH_TYPE__'>  /**
+</span>  * @method __REPLACE_WITH_TYPE__
+  * Sugar function for `get` constructor. Effectively does `get(__REPLACE_WITH_TYPE)`
+  *
+  * Replace `__REPLACE_WITH_TYPE` with 'review', 'question', 'answer', 'story', 'comment', 'author', 'photo', 'video', 'product', or 'category'.
+  * You may also use the plural versions of the display types.
+  *
+  * For example, instead of `get('reviews')`, use `reviews()`.
+  *
+  * @param {String | Array} idList the list of ids to filter by for display content type
+  * @return {Object} display object for chaining
+  * @chainable
+  */
+  _( typePairs )
+  // Go through each of the pairs
+  .forEach(function ( typePair ) {
+    // Create the get sugar functions (they are the same)
+    client[ typePair[0] ] = client[ typePair[1] ] = function ( idList ) {
+      // Use the arguments array if we're passed raw numbers
+      if ( idList &amp;&amp; ! _.isArray( idList ) ) {
+        idList = _.toArray( arguments );
+      }
+      // Obviously this is just a sham marriage and we call back into
+      // the real deal and return it's result.
+      return this.get( typePair[1], idList );
+    };
+  });
+
+  // Everything hinges off of a `get` (or a get sugar function)
+  // These are like the jQuery plugins.
+  //
+  // We alias `get.prototype` because all of the cool kids are doing
+  // it. No other reason.
+  get.fn = get.prototype = {
+<span id='BV-api-get-method-constructor'>    /**
+</span>    * Creates the display url builder
+    *
+    * @param {String} displayContentType the content type that is being displayed
+    * @param {String | Array} idList the list of ids to filter by for display content type
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    constructor: get,
+
+    init : function( displayContentType, idList ) {
+      this.config = _.extend( {}, client._config );
+
+      this._data = {
+        displayContentType : displayContentType
+      };
+
+      // Filter by the passed in id. Shorthand for `get(type).filterBy('id' ...`
+      if ( idList ) {
+        return this.filterBy( 'id', '=', idList );
+      }
+
+      // Handle no Id(s)
+      return this;
+    },
+
+<span id='BV-api-get-method-as'>    /**
+</span>    * This overrides the config `format` value just for this query.
+    *
+    * @param {String} format
+    * @return {Object} display object for chaining
+    */
+    as : function ( format ) {
+      this.config.format = format;
+      return this;
+    },
+
+<span id='BV-api-get-method-withFormat'>    /**
+</span>    * This overrides the config `format` value just for this query.
+    *
+    * @param {String} format
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    withFormat : function ( format ) {
+      return this.as( format );
+    },
+
+<span id='BV-api-get-method-withNormalize'>    /**
+</span>    * This overrides the config `normalize` value just for this query.
+    *
+    * @param {String} normalize
+    * @return {Object} display object for chaining
+    */
+    withNormalize : function ( normalize ) {
+      this.config.normalize = normalize;
+      return this;
+    },
+
+<span id='BV-api-get-method-withPasskey'>    /**
+</span>    * This overrides the config `passkey` value just for this query.
+    *
+    * @param {String} passkey
+    * @return {Object} display object for chaining
+    */
+    withPasskey : function ( passkey ) {
+      this.config.passkey = passkey;
+      return this;
+    },
+
+<span id='BV-api-get-method-withBaseUrl'>    /**
+</span>    * This overrides the config `baseUrl` value for just this query.
+    *
+    * @param {String} baseUrl
+    * @return {Object} display object for chaining
+    */
+    withBaseUrl : function ( baseUrl ) {
+      this.config.baseUrl = baseUrl;
+      return this;
+    },
+
+<span id='BV-api-get-method-inLocale'>    /**
+</span>    * Overrides the `locale` config value for a query.
+    *
+    * @param {String} locale
+    * @return {Object} display object for chaining
+    */
+    inLocale : function ( locale ) {
+      this.config.locale = locale;
+      return this;
+    },
+
+<span id='BV-api-get-method-locale'>    /**
+</span>    * Sugar function for the `inLocale` function.
+    *
+    * @param {String} locale
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    locale : function ( locale ) {
+      return this.inLocale( locale );
+    },
+
+
+<span id='BV-api-get-method-include'>    /**
+</span>    * This is a direct interpretation of what the api
+    * string requires for 'includes'. It just adds in
+    * the types that you give here. Order doesn't matter.
+    *
+    * It accepts lists or a single element (of types)
+    *
+    * This does not do any special subquerying or anything like
+    * that. It does not require end, and by default nothing
+    * is filtered in the responses.
+    *
+    * @param {Array | String} keys
+    * @return {Object} display object for chaining
+    */
+    include : function ( keys ) {
+      // More than 1 must mean it's an arg list
+      // so convert to array
+      if ( arguments.length &gt; 1 ) {
+        keys = _.toArray( arguments );
+      }
+      // Just one is either an array, or a single key
+      // so check for array, otherwise convert to
+      // single element array
+      else if ( keys &amp;&amp; ! _.isArray( keys ) ) {
+        keys = [keys];
+      }
+      // In the array case, we already have the format we want
+      // so, no-op.
+
+      // We allow includes to be defined in the config, since lots of
+      // people won't want to consider them later.
+      //
+      // Anything that we have in config, we might as well override in config
+      // so we don't have to look two places for it. Maybe I'll change my mind
+      // about this one day, but it's pretty easy to maintain right now.
+      this.config.include = _.union( this.config.include || [], keys || [] );
+
+      // Chain
+      return this;
+    },
+
+<span id='BV-api-get-method-offset'>    /**
+</span>    *  Modifies the config `offset` value per query.
+    *
+    * @param {number} offset
+    * @return {Object} display object for chaining
+    */
+    offset : function ( offset ) {
+      // only one allowed, always just override
+      this.config.offset = offset;
+      return this;
+    },
+
+<span id='BV-api-get-method-offsetBy'>    /**
+</span>    * Sugar function for `offset()`.
+    *
+    * @param {number} offset
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    offsetBy : function ( offset ) {
+      return this.offset( offset );
+    },
+
+<span id='BV-api-get-method-limit'>    /**
+</span>    * This is much like `offset`, but for `limit`.
+    *
+    * @param {number} limit
+    * @return {Object} display object for chaining
+    */
+    limit : function ( limit ) {
+      // only one allowed, always just override
+      this.config.limit = limit;
+      return this;
+    },
+
+<span id='BV-api-get-method-limitTo'>    /**
+</span>    * Sugar function for `limit`
+    *
+    * @param {number} limit
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    limitTo : function ( limit ) {
+      return this.limit( limit );
+    },
+
+<span id='BV-api-get-method-page'>    /**
+</span>    * NOTE :: This is 1 indexed - NOT zero-indexed
+    *
+    * This a helper for people writing apps with pages.
+    * It works a lot more predictably if you've set a limit,
+    * because then it makes sense. If you didn't set a limit,
+    * we'll send you a warning, and just use 10 (which is the
+    * api default).
+    *
+    * The logic is that a page starts at 1, so it's just the
+    * offset multiplied by the limit minus one whole limit.
+    * e.g. page 6 of limit 10 is 50 through 59
+    *
+    * 0-10  10-20  20-30  30-40  40-50  50-60
+    *
+    * pg1   pg2    pg3    pg4    pg5    pg6
+    *
+    * @param {number} pageNum
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    page : function ( pageNum ) {
+      var res = this;
+      if ( ! this.config.limit ) {
+        client.warn('You are calling `page` without setting the number per page. Using 10 as your `limit`.');
+        // Set a default
+        // TODO :: _maybe_ unhardcode this in the middle
+        // but it is hardcoded into the api like this
+        // and we only want to put it into the request
+        // if we actually need it
+        res = this.limit( 10 );
+      }
+      // This just calls offset under the covers. Remember offset is atomic. The
+      // last one set wins. So don't have an offset and a page call in the same query.
+      return res.offset( ( pageNum * this.config.limit ) - this.config.limit );
+    },
+
+    /*
+    * This just reads better sometimes in the query (just sugar for `page`)
+    * 
+    * @param {number} pageNum
+    * @return {Object} display object for chaining
+    */
+    onPage : function ( pageNum ) {
+      return this.page( pageNum );
+    },
+
+    // The subquery stuff uses this function when it's all done. This function
+    // knows how to take all the modifications of a type and apply them to the global
+    // set of data instead of in the subQuery.
+    //
+    // You probably don't want to call this directly. This is what `.end()` calls
+    // when the subquery is done. This is where all the key and operator grouping
+    // are done.
+    _get : function ( type, mods ) {
+      var self = this;
+      // Bail gracefully if we're broken
+      // We need both of these values always.
+      if ( !type || !mods ) {
+        client.warn( &quot;Invalid use of _get private function.&quot;, arguments);
+        return this;
+      }
+
+      // Consistency of keys is important for grouping,
+      // so make sure everything goes in as lower case.
+      type = type.toLowerCase();
+
+      // For the filters
+
+      // Create it if it don't exist
+      self._data.subfilters = self._data.subfilters || {};
+
+      // Add each of the filters to the sub filter list
+      _( mods.filters ).forEach(function ( filterObj ) {
+        // Translate the `=` -&gt; `eq` stuff
+        filterObj.operator = logicalKeys[ filterObj.operator ] || filterObj.operator;
+
+        // Create space for this sub filter -- corresponds to `filter_&lt;type&gt;`
+        self._data.subfilters[ type ] =  self._data.subfilters[ type ] || {};
+        self._data.subfilters[ type ][ filterObj.key ] = self._data.subfilters[ type ][ filterObj.key ] || {};
+        self._data.subfilters[ type ][ filterObj.key ][ filterObj.operator ] = self._data.subfilters[ type ][ filterObj.key ][ filterObj.operator ] || [];
+
+        // Push the filter onto the unique sub filter
+        self._data.subfilters[ type ][ filterObj.key ][ filterObj.operator ].push(filterObj.value);
+      });
+
+      // For the sorts
+
+      _( mods.sorts ).forEach(function ( sortObj ) {
+        // Translate `+`/`-` to `asc`/`desc` if necessary
+        sortObj.dir = dirKeys[ sortObj.dir ] || sortObj.dir;
+
+        // We don't need to nest as deep since all sorts can be grouped together.
+        // Whereas all the filters can only be grouped if the key and the operator are the same.
+        self._data.subsorts = self._data.subsorts || {};
+        self._data.subsorts[ type ] = self._data.subsorts[ type ] || [];
+
+        // Push on the object, we don't need to group since sorts can't be chained the same
+        // way as filters can be.
+        self._data.subsorts[ type ].push( sortObj );
+      });
+
+      // We only support a single limit, so nothing too complex
+      if ( mods.limit ) {
+        // Create a new one or use the old one if it exists.
+        self._data.sublimits = self._data.sublimits || {};
+        self._data.sublimits[ type ] = mods.limit;
+      }
+
+      // We only support a single offset, so nothing too complex here either.
+      if ( mods.offset ) {
+        self._data.suboffsets = self._data.suboffsets || {};
+        self._data.suboffsets[ type ] = mods.offset;
+      }
+
+      // We only support a single search string, so nothing too complex
+      if ( mods.search ) {
+        self._data.subsearch = self._data.subsearch ||  {};
+        self._data.subsearch[ type ] = mods.search;
+      }
+
+      return this.include( type );
+    },
+
+<span id='BV-api-get-method-get'>    /**
+</span>    * This is essentially a &quot;subquery&quot; of sorts.
+    * It requires an `end` call.
+    * The filters and sorts you apply are only applied to the sub query.
+    * You do not _also_ need to call `include`.
+    * The `filterIncluded` and `filterSorted`, etc. function actually call into these
+    * subqueries to keep the logic in one place.
+    * It uses it's returned object to keep the chaining alive and then calls
+    * the &quot;private&quot; `_get` function that takes the object that's been built up
+    * and applies that to the original chain.
+    *
+    * @param {String} type
+    * @param {Array|String} idList
+    * @return {Object} subquery display object for chaining
+    * @chainable
+    */
+    get : function ( type, idList ) {
+      var mods = {
+            filters : [],
+            sorts   : []
+          },
+          fn = function (){},
+          res;
+      // Do our own little prototypal inheritance
+      // essentially `object.create`
+      fn.prototype = subquerySet;
+      res = new fn();
+      res.mods = mods;
+      res.type = type;
+      res.self = this;
+      res.config = this.config;
+
+      if ( idList ) {
+        return res.filterBy( 'id', '=', idList );
+      }
+
+      return res;
+    },
+
+
+
+<span id='BV-api-get-method-filterIncluded'>    /**
+</span>    * Sugar for subqueries - best for english looking
+    * queries. This can actually go in any order you want it to in the
+    * query, because it just results in a totally separate key/val in the
+    * request. It makes the most sense right after an `include` call.
+    *
+    * NOTE :: this function is unique because you MUST call the `by`
+    * function directly after it. It reads nicely, and the other functions
+    * aren't even included (on purpose). Once you call these two functions
+    * together, you are put back on the original query.
+    *
+    * You cannot call this in a subquery because you can't have includes in
+    * includes.
+    *
+    * The signature of `by` is the same as `filterBy` and takes all the same
+    * variants ( `filterBy` is called under the covers ). The `filterIncluded`
+    * function just takes the content type of the include.
+    *
+    * TECHNICALLY :: you don't have to call `include` at all. This will auto
+    * include it for you. But I'm not suggesting that. It's just too easy
+    * to catch for you to not do.
+    *
+    * @param {String} type
+    * @param {String} key
+    * @param {String} operator
+    * @param {String} value
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    filterIncluded : function ( type, key, operator, value ) {
+      var self = this;
+
+      if ( arguments.length &gt; 1 ) {
+        return self.get.call( self, type ).filterBy( key, operator, value ).end();
+      }
+
+      else {
+        // Return an object with the mandatory next function on it, but the
+        // closure gives us access to `type` once that is called.
+        return {
+          // This is the real filter function, but it just creates a subquery
+          // and ends it for you behind the scenes.
+          by : function ( a, b, c ) {
+            // Call the `get` subquery function in the scope of the outer query
+            // Make sure we call end to auto-end the subquery for you.
+            return self.get.call( self, type ).filterBy( a, b, c ).end();
+          }
+        };
+      }
+    },
+
+<span id='BV-api-get-method-sortIncluded'>    /**
+</span>    * See: filterIncluded
+    * All the same rules for `filterIncluded` apply to this, just for sorts
+    *
+    * @param {String} type
+    * @param {String} dir
+    * @param {String} key
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    sortIncluded : function ( type, dir, key ) {
+      var self = this;
+
+      if ( arguments.length &gt; 1 ) {
+        return self.get.call( self, type ).sortBy( dir, key ).end();
+      }
+
+      else {
+        return {
+          by : function ( a, b ) {
+            return self.get.call( self, type ).sortBy( a, b ).end();
+          }
+        };
+      }
+    },
+
+<span id='BV-api-get-method-offsetIncluded'>    /**
+</span>    * See: filterIncluded
+    * All the same rules for `filterIncluded` apply to this, just for offsets
+    *
+    * @param {String} type
+    * @param {String} offset
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    offsetIncluded : function ( type, offset ) {
+      var self = this;
+
+      if ( arguments.length &gt; 1 ) {
+        return self.get.call( self, type ).offset( offset ).end();
+      }
+
+      else {
+        return {
+          by : function ( a ) {
+            return self.get.call( self, type ).offset( a ).end();
+          }
+        };
+      }
+    },
+
+<span id='BV-api-get-method-limitIncluded'>    /**
+</span>    * See: filterIncluded
+    * NOTE :: this one's a bit different because sometimes you wanna say
+    * `limit TO num` instead of `limit BY num` so we allow both.
+    *
+    * @param {String} type
+    * @param {String} limit
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    limitIncluded : function ( type, limit ) {
+      var self = this;
+
+      if ( arguments.length &gt; 1 ) {
+        return self.get.call( self, type ).limit( limit ).end();
+      }
+
+      else {
+        return {
+          to : function ( a ) {
+            return self.get.call( self, type ).limit( a ).end();
+          },
+          // By is just sugar for `to`
+          by : function () {
+            return this.to.apply(this, _.toArray( arguments ));
+          }
+        };
+      }
+    },
+
+<span id='BV-api-get-method-searchIncluded'>    /**
+</span>    * See : filterIncluded
+    * NOTE :: this one's a bit different because sometimes you wanna say
+    * `search ON search_text` instead of `search BY search_text` so we allow both.
+    *
+    * @param {String} type
+    * @param {String} search_text
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    searchIncluded : function ( type, search_text ) {
+      var self = this;
+
+      if ( arguments.length &gt; 1 ) {
+        return self.get.call( self, type ).search( search_text ).end();
+      }
+
+      else {
+        return {
+          on : function ( a ) {
+            return self.get.call( self, type ).search( a ).end();
+          },
+          // By is just sugar for `to`
+          by : function ( a ) {
+            return self.get.call( self, type ).search( a ).end();
+          }
+        };
+      }
+    },
+
+<span id='BV-api-get-method-withStatsOn'>    /**
+</span>    * This turns on stats for whatever keys you pass in.
+    * This is pretty separate from other parts of a request,
+    * so there's not a ton of interaction. It can take a single
+    * param, multiple params, or an array of params as input. 
+    * 
+    * results in stats=type1,type2,type3
+    *
+    * @param {Object} keys
+    * @return {Object} display object for chaining
+    */
+    withStatsOn : function ( keys ) {
+      // More than 1 must mean it's an arg list
+      // so convert to array
+      if ( arguments.length &gt; 1 ) {
+        keys = _.toArray( arguments );
+      }
+      // Just one is either an array, or a single key
+      // so check for array, otherwise convert to
+      // single element array
+      else if ( keys &amp;&amp; ! _.isArray( keys ) ) {
+        keys = [keys];
+      }
+      // In the array case, we already have the format we want
+      // so, no-op.
+
+      // Much like before, we just use the base config stuff here
+      this.config.stats = _.union( this.config.stats || [], keys );
+      return this;
+    },
+
+<span id='BV-api-get-method-stats'>    /**
+</span>    * Shorter function, less descriptive name for `withStatsOn`. Sugar.
+    *
+    * @param {Object} keys
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    stats : function () {
+      return this.withStatsOn.apply(this, arguments);
+    },
+
+<span id='BV-api-get-method-withSearchOn'>    /**
+</span>    * This turns on search for whatever search text you pass in.
+    * It takes only the last values passed in.
+    * 
+    * @param {String} search_text
+    * @return {Object} display object for chaining
+    */
+    withSearchOn : function ( search_text ) {
+      this.config.search = search_text;
+      return this;
+    },  
+
+<span id='BV-api-get-method-search'>    /**
+</span>    * Shorter function, less descriptive name for `withSearchOn`. Sugar.
+    * 
+    * @param {String} search_text
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    search : function () {
+      return this.withSearchOn.apply(this, arguments);
+    },
+
+<span id='BV-api-get-method-sortBy'>    /**
+</span>    * Much like `filterBy` accept for sorting. The only real output difference is that all sorts can be
+    * grouped into a single place, as long as they're ordered correctly.
+    *
+    * This function takes just a key, or a cardinality (direction) and a key.
+    *
+    * It defaults to `DESC` if you don't set it.
+    *
+    * You can also use the `+` / `-` syntax for ascending and descending
+    * instead of the regular shorthand.
+    *
+    * @param {String} dir
+    * @param {String} key
+    * @return {Object} display object for chaining
+    */
+    sortBy : function ( dir, key ) {
+      // Assume `desc` if there is no cardinality given
+      if ( ! key ) {
+        key = dir;
+        dir = 'desc';
+      }
+
+      // Set the direction to the real word
+      dir = dirKeys[ dir ] || dir;
+
+      // There can only be one sort per key, so no need for arrays
+      // Order does matter though. Unlike filters.
+      // TODO :: consider warning when a conflicting sort comes in
+
+      this._data.sorts =  this._data.sorts || [];
+
+      // Push on the lowercase versions of these things.
+      this._data.sorts.push({
+        key : (&quot;&quot; + key).toLowerCase(),
+        dir : (&quot;&quot; + dir).toLowerCase()
+      });
+
+      // Chain.
+      return this;
+    },
+
+<span id='BV-api-get-method-filterBy'>    /**
+</span>    * Builds filter statements for the main data type.
+    * Defaults to `=` if no operator is sent.
+    *
+    * Takes 1, 2 or 3 arguments.
+    *
+    * 1 arg is converted to:
+    * `&lt;key&gt;:eq:true`
+    *
+    * 2 args is converted to:
+    * `&lt;key&gt;:eq:&lt;val&gt;` (note the value is not the `value` argument named there.)
+    *
+    * 3 args is explicit. Use it as much as feasible.
+    *
+    * Grouping occurs when key and operator are the same. Orders are FIFO.
+    *
+    * @param {String} key
+    * @param {String} operator
+    * @param {String} value
+    * @return {Object} display object for chaining
+    */
+    filterBy : function ( key, operator, value ) {
+      var self = this;
+
+      // Let's do lowercase keys
+      key = key.toLowerCase();
+
+      // Implicit `=` for shorthand
+      if ( typeof value == 'undefined' ) {
+        if ( operator ) {
+          value     = operator;
+          operator  = '=';
+        }
+        // Assume it's a boolean filter if there's no value
+        else {
+          operator = '=';
+          value = 'true';
+        }
+      }
+
+      // This converts numbers and booleans to a string
+      value = &quot;&quot; + value;
+
+      // Allow the use of the real logical operators, but
+      // switch them out with the api ones here, instead of
+      // later. That way people can use both if they want :/
+      if ( logicalKeys[ operator ] ) {
+        operator = logicalKeys[ operator ];
+      }
+      // Instantiate an array of filters to use.
+      // Blocked out by id and key (since they have to be grouped that way in the end)
+      this._data.filters = this._data.filters || {};
+      this._data.filters[ key ] = this._data.filters[ key ] || {};
+      this._data.filters[ key ][ operator ] = this._data.filters[ key ][ operator ] || [];
+
+      // Convert value to an array, so we only have to handle it once.
+      if ( ! _.isArray( value ) ) {
+        value = [ value ];
+      }
+
+      // Loop through the values, and add a filter object for each
+      _( value ).forEach(function ( filterValue ) {
+        self._data.filters[ key ][ operator ].push( filterValue );
+      });
+
+      // Chain.
+      return this;
+    },
+
+<span id='BV-api-get-method-checksum'>    /**
+</span>    * Returns checksum of the serialization of this request
+    * @param {String} raw  The `extra` argument adds additional info before checksum
+    * @return {String} checksum
+    */
+    checksum : function (extra) {
+      return checksum( this.serialize() + (extra || '') );
+    },
+
+<span id='BV-api-get-method-serialize'>    /**
+</span>    * Serialize display url.
+    *
+    * @param {Boolean} raw  leave the keys and values from being URI encoded.
+    * This is generally useful when debugging and stuff. The regular `serialize` is likely safer without it.
+    * @return {String} serialized url
+    */
+    serialize : function ( raw ) {
+      var self  = this,
+          // This is the ordered sequence of key value params
+          query = [],
+          d = this._data,
+          path  = '';
+
+      // Let's get the boring stuff out of the way.
+      path += d.displayContentType;
+      path += '.' + this.config.format;
+
+      // passkey is required
+      query.push({
+        key : 'passkey',
+        val : self.config.passkey
+      });
+
+      // Apiversion is required
+      query.push({
+        key : 'apiversion',
+        val : self.config.apiversion
+      });
+
+      // Pull in filters
+
+      // Loop through the top-level filters
+      _( d.filters ).forEach(function ( filterGroup, filterKey ) {
+        // Loop through each of the logical operators
+        _( filterGroup ).forEach(function ( filterVals, filterOperator ) {
+          // Push each set of filters on a single operator as a comma delimited list
+          if ( filterVals.length ) {
+            query.push({
+              key : 'filter',
+              val : filterKey + ':' + filterOperator + ':' + _(filterVals).uniq().join(',')
+            });
+          }
+        });
+      });
+
+      // If there are sorts, push them all onto the same querystring param
+      // separated by commas - ignore dupes
+      if ( d.sorts &amp;&amp; d.sorts.length ) {
+        query.push({
+          key : 'sort',
+          val : _( d.sorts ).chain()
+          .uniq( false, function ( obj ) {
+            // Make it unique by key
+            return obj.key;
+          })
+          .map(function ( sort ) {
+            return sort.key + ':' + sort.dir;
+          })
+          .value().join(',')
+        });
+      }
+
+      // Include the stats as a single entity.
+      if ( this.config.stats &amp;&amp; this.config.stats.length ) {
+       query.push({
+         key : 'stats',
+         val : _( this.config.stats ).chain().map(function(key){ return key.toLowerCase(); }).uniq().value().join(',')
+       });
+      }
+
+      // Add in the includes
+      if ( this.config.include &amp;&amp; this.config.include.length ) {
+       query.push({
+         key : 'include',
+         val : _( this.config.include ).chain().map(function(key){ return key.toLowerCase(); }).uniq().value().join(',')
+       });
+      }
+
+      // Add in the include subfilters
+      _( d.subfilters ).forEach(function ( typeGroup, typeKey ) {
+        _( typeGroup ).forEach(function ( filterGroup, filterKey ) {
+          // Loop through each of the logical operators
+          _( filterGroup ).forEach(function ( filterVals, filterOperator ) {
+            // Push each set of filters on a single operator as a comma delimited list
+            if ( filterVals.length ) {
+              query.push({
+                key : 'filter_' + typeKey,
+                val : filterKey + ':' + filterOperator + ':' + _(filterVals).uniq().join(',')
+              });
+            }
+          });
+        });
+      });
+
+      // If there are subsorts, push them all onto the same querystring param
+      // per type
+      // separated by commas - ignore dupes
+      _( d.subsorts ).forEach(function ( subsorts, type ) {
+        query.push({
+          key : 'sort_' + type,
+          val : _( subsorts ).chain()
+          .uniq( false, function ( obj ) {
+            // Make it unique by key
+            return obj.key;
+          })
+          .map(function ( sort ) {
+            return sort.key + ':' + sort.dir;
+          })
+          .value().join(',')
+        });
+      });
+
+      // Limit (zero check for some stupid reason)
+      if ( this.config.limit || this.config.limit === 0 ) {
+        query.push({
+          key : 'limit',
+          val : this.config.limit
+        });
+      }
+
+      // offset (zero check for some stupid reason)
+      if ( this.config.offset || this.config.offset === 0 ) {
+        query.push({
+          key : 'offset',
+          val : this.config.offset
+        });
+      }
+
+      // offset (zero check for some stupid reason)
+      if ( this.config.search ) {
+        query.push({
+          key : 'search',
+          val : this.config.search
+        });
+      }
+
+      // Sub limit additions
+      _( d.sublimits ).forEach(function ( limit, type ) {
+        query.push({
+          key : 'limit_' + type,
+          val : limit
+        });
+      });
+
+      // Sub offset operations
+      _( d.suboffsets ).forEach(function ( offset, type ) {
+        query.push({
+          key : 'offset_' + type,
+          val : offset
+        });
+      });
+
+      // Sub search operations
+      _( d.subsearch ).forEach(function ( search_text, type ) { 
+        query.push({
+          key : 'search_' + type,
+          val : search_text
+        });
+      });
+
+      if ( this.config.locale ) {
+        query.push({
+          key : 'locale',
+          val : this.config.locale
+        });
+      }
+
+      // Build the query string
+      query = _( query ).map(function ( pair ) {
+        // Raw is more human readable, but against spec, yo
+        if ( raw ) {
+          return pair.key + '=' + pair.val;
+        }
+        // Safest bet
+        return global.encodeURIComponent( pair.key ) + '=' + global.encodeURIComponent( pair.val );
+      }).join('&amp;');
+
+      if ( this.config.baseUrl ) {
+        return this.config.baseUrl + path + '?' + query;
+      }
+      return path + '?' + query;
+    }
+  };
+
+<span id='BV-api-get-method-__REPLACE_WITH_PREFIX____REPLACE_WITH_TYPE__'>  /**
+</span>  * @method __REPLACE_WITH_PREFIX____REPLACE_WITH_TYPE__
+  * Sugar function for `filterBy` fuction. Effectively does `filterBy(__REPLACE_WITH_TYPE__, ...)`
+  *
+  * Replace `__REPLACE_WITH_TYPE` with 'review', 'question', 'answer', 'story', 'comment', 'author', 'photo', 'video', 'product', or 'category'.
+  * You may also use the plural versions of the display types.
+  * By default, the prefix is 'for'. 'review', 'comment', 'photo', and 'video' use 'with'. 'author' uses 'from'. 'category' uses 'in'.
+  *
+  * For example, instead of `filter('review', `=`, 1)`, use `withReview('=', 1)`.
+  *
+  * @param {String | Array} idList the list of ids to filter by for display content type
+  * @return {Object} display object for chaining
+  * @chainable
+  */
+  _( typePairs ).forEach(function ( pair ) {
+    var singular = pair[ 0 ].substr(0,1).toUpperCase() + pair[ 0 ].substr(1),
+        plural   = pair[ 1 ].substr(0,1).toUpperCase() + pair[ 1 ].substr(1),
+        helpers   = ['for'];
+
+    // This is the third param, which is the custom prefix for the
+    // for&lt;Type&gt; type of pattern. Sometimes 'for' doesn't make as much sense
+    // as other things.
+    if ( pair[ 2 ] ) {
+      helpers.push( pair[ 2 ] );
+    }
+
+    // Add the helper functions for 'for' and special helpers on every type.
+    _( helpers ).forEach(function ( helper ) {
+      get.fn[ helper + plural ] = subquerySet[ helper + plural ] = function ( idList ) {
+        if ( !idList ) {
+          return this;
+        }
+        // Use the arguments array if we're passed raw numbers
+        if ( idList &amp;&amp; ! _.isArray( idList ) ) {
+          idList = _.toArray( arguments );
+        }
+
+        // These extra sugar functions actually just call filters.
+        return this.filterBy( pair[0]+'id', '=', idList );
+      };
+
+      // Add em to the prototype
+      get.fn[ helper + singular ] = subquerySet[ helper + singular ] = function ( id ) {
+        if ( ! id ) {
+          return this;
+        }
+        return this[ helper + plural ]( [id] );
+      };
+    });
+  });
+
+  // Both the query and subquery inherit from the same thing.
+  var helperFilters = {
+<span id='BV-api-get-method-before'>    /**
+</span>    * Filter to things with a date before the given string
+    *
+    * @param {String} dateStr
+    * @param {Boolean} include inclusive of the dateStr, by default
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    before : function ( dateStr, include ) {
+      return this.filterBy( this.config.timeKey, include === false ? '&lt;' : '&lt;=', dateStr );
+    },
+
+<span id='BV-api-get-method-after'>    /**
+</span>    * Filter to things with a date after the given string. 
+    *
+    * @param {String} dateStr
+    * @param {Boolean} include exclusive of the dateStr, by default
+    * @return {Object} display object for chaining
+    * @chainable
+    */
+    after : function ( dateStr, include ) {
+      return this.filterBy( this.config.timeKey, include ? '&gt;=' : '&gt;', dateStr );
+    }
+  };
+
+  // Add to the core `get`
+  _.extend( get.fn, helperFilters );
+
+  // Add to the subquery `get`
+  _.extend( subquerySet, helperFilters );
+
+  // Chain me, yo.
+  get.fn.init.prototype = get.fn;
+  subquerySet.constructor = get.fn.get;
+
+  // return the module.
+  return client;
+});
+</pre>
+</body>
+</html>

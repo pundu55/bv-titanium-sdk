@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">define([
+  'jquery',
+  'api/api',
+  'api/submit',
+  'api/normalizer',
+], function ($, api, submit, normalizer) {
+
+  var client = submit || api;
+
+  client.normalize = function (data, opts) {
+    return normalizer.normalize(data, opts);
+  };
+
+  // ## `send` GET
+  //
+  // This function relies on jQuery's $.ajax functionality. This calls
+  // into `serialize` and then actually makes the request. The function
+  // returns the `jqXHR` object that jQuery returns. This is a deferred
+  // based system, so calling `done` and `fail` on it will be the way
+  // that you get the response.
+  //
+  // This tries to handle normalization turned on or off, as well as some
+  // initial caching efforts.
+  //
+  // If you choose not to included jQuery and want to implement your own
+  // send, just override this function and jQuery won't be referenced
+  // outside of it or the normalization function.
+  client.get.fn.send = function (name) {
+    var self = this,
+      getUrl = self.serialize(),
+      rawData,
+      result;
+
+    // Create a jQuery request object that returns a deferred.
+    rawData = $.ajax({
+      url : getUrl,
+      dataType : 'jsonp',
+      cache : true,
+      // 8 second timeout so that fail() will trigger for JSONP requests
+      timeout : 8000,
+      crossDomain: true,
+      jsonpCallback : 'bv' + $.fn.jquery.replace(/\./ig, &quot;&quot;) + '_' + self.checksum(name)
+    });
+
+    if (client._config.normalize) {
+      result = $.Deferred();
+      rawData
+        .done(function (data) {
+          var normalized = client.normalize(data, { contentType : self._data.contentType });
+          result.resolve(normalized);
+        })
+        .fail(function () {
+          result.reject.apply(result, arguments);
+        });
+
+      return result;
+    }
+    else {
+      return rawData;
+    }
+  };
+
+  // ## `send` POST
+  //
+  // This function relies on jQuery's $.ajax functionality. This calls
+  // into `serialize` and then actually makes the request. The function
+  // returns the `jqXHR` object that jQuery returns. This is a deferred
+  // based system, so calling `done` and `fail` on it will be the way
+  // that you get the response.
+  //
+  // If you choose not to included jQuery and want to implement your own
+  // send, just override this function and jQuery won't be referenced
+  // outside of it or the normalization function.
+  client.submit.fn.send = function () {
+    var self = this,
+      postUrl = self.getHierarchialPartString(),
+      postData = self.getQueryString(),
+      rawData,
+      result;
+
+    // Create a jQuery request object that returns a deferred.
+    rawData = $.ajax({
+      type: 'POST',
+      url : postUrl,
+      data: postData,
+      cache : true,
+      timeout : 8000
+    });
+
+    return rawData;
+  };
+
+  return client;
+});
+</pre>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">// Start the main app logic.
+require.config({
+  paths : {
+    jquery : 'lib/jquery.min',
+    underscore : 'lib/lodash.min'
+  }
+});
+
+require(['api/api', 'api/submit', 'api/send-ti'], function ( api, submit, send ) {
+  var root = this;
+
+  // Inspirtation and code taken from:
+  // https://github.com/amdjs/underscore/blob/master/underscore.js
+  
+  // Export the api object for **Node.js** and **&quot;CommonJS&quot;**, with
+  // backwards-compatibility for the old `require()` API. If we're not in
+  // CommonJS, add `_` to the global object via a string identifier for
+  // the Closure Compiler &quot;advanced&quot; mode. Registration as an AMD module
+  // via define() happens at the end of this file.
+  if (typeof exports !== 'undefined') {
+    if (typeof module !== 'undefined' &amp;&amp; module.exports) {
+      // console.log('module.exports detected');
+      exports = module.exports = api;
+    }
+    // console.log('exports detected');
+    exports.bvapi = api;
+  } else {
+    // console.log('nothing detected...exposing BV.api');
+
+<span id='BV'>    /**
+</span>    * @class BV
+    * @singleton
+    * External Bazaarvoice Javascript object namespace
+    */
+    root.BV = root.BV || {};
+<span id='BV-api'>    /**
+</span>    * @class BV.api
+    * @extends BV
+    * @singleton
+    * External Bazaarvoice Javascript API Library object namespace
+    */
+    root.BV.api = api || {};
+  }
+
+  // AMD define happens at the end for compatibility with AMD loaders
+  // that don't enforce next-turn semantics on modules.
+  if (typeof define === 'function' &amp;&amp; define.amd) {
+    // console.log('amd detected');
+    define('bvapi', function() {
+      return api;
+    });
+  }
+});</pre>
+</body>
+</html>

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>The source code</title>
+  <link href="../resources/prettify/prettify.css" type="text/css" rel="stylesheet" />
+  <script type="text/javascript" src="../resources/prettify/prettify.js"></script>
+  <style type="text/css">
+    .highlight { display: block; background-color: #ddd; }
+  </style>
+  <script type="text/javascript">
+    function highlight() {
+      document.getElementById(location.hash.replace(/#/, "")).className = "highlight";
+    }
+  </script>
+</head>
+<body onload="prettyPrint(); highlight();">
+  <pre class="prettyprint lang-js">/*
+* BV API Submit URL builder - JavaScript
+* Depends on:
+*   underscore &gt;= 1.2.3
+*
+* MIT License
+* @version 0.1.0 beta
+* @bvapiversion &gt;= 5.0
+*/
+define(['api/api', 'underscore', 'util/checksum'], function(client, _, checksum) {
+	var global = this, 
+	submitTypes = [
+		['review'], 
+		['question'], 
+		['answer'], 
+		['story'], 
+		['reviewComment'], 
+		['storyComment'], 
+		['photo', 'upload'], 
+		['video', 'upload'], 
+		['feedback']], 
+	submitParams = ['productId', 'action', 'agreeToTermsAndConditions', 'callback', 'campaignId', 'hostedAuthentication_authenticatedEmail', 'hostedAuthentication_callbackUrl', 'isRecommended', 'netPromoterComment', 'netPromoterScore', 'rating', 'reviewText', 'sendEmailAlertWhenCommented', 'sendEmailAlertWhenPublished', 'title', 'user', 'userEmail', 'userId', 'userLocation', 'userNickname', 'questionSummary', 'isUserAnonymous', 'questionDetails', 'categoryId', 'answerText', 'questionId', 'storyText', 'reviewId', 'commentText', 'storyId', 'photo', 'video', 'feedbackType', 'vote', 'reasonText', 'contentId', 'contentType'], 
+	submitDimensionIdParams = ['additionalField', 'contextDataValue', 'rating', 'tagId'], 
+	submitNthParams = ['photoCaption', 'photoUrl', 'productRecommendationId', 'videoCaption', 'videoUrl'], 
+	submitNthDimensionIdParams = ['tag'], 
+
+
+<span id='BV-api-method-submit'>	/**
+</span>	* @method submit
+	* @member BV.api
+	* 
+	* This function kicks things off. It uses the jQuery pattern of calling a prototype to
+	* actually kick off a new instance. The `new` keyword creates a new instance scope so
+	* all the data called on it after a `submit` call and it's alieases won't affect other queries.
+	*
+	* @param {String} submitContentType the content type that is being submitted
+	* @param {String} submitPrefix the prefix used in the url before submit content type Default: submit
+	* @return {Object} submit object for chaining
+	* @chainable
+	*/
+	submit = function(submitContentType, submitPrefix) {
+		return new submit.fn.init(submitContentType, submitPrefix);
+	};
+
+<span id='BV-api-submit'>	/**
+</span>	* @class BV.api.submit
+	* @extends BV.api
+	* Submit API URL builder object 
+	*/
+	submit.fn = submit.prototype = {
+<span id='BV-api-submit-method-constructor'>		/**
+</span>		* Creates the submit url builder.
+		*
+		* @param {String} submitContentType the content type that is being submitted
+		* @param {String} submitPrefix the prefix used in the url before submit content type Default: submit
+		* @return {Object} submit object for chaining
+		* @chainable
+		*/
+		constructor : submit,
+
+
+		init : function(submitContentType, submitPrefix) {
+			this.config = _.extend({}, client._config);
+
+			this._data = {
+				submitContentType : submitContentType.toLowerCase(),
+				submitPrefix : 'submit'
+			};
+
+			if (submitPrefix) {
+				this._data.submitPrefix = submitPrefix;
+			}
+
+			return this;
+		},
+
+<span id='BV-api-submit-method-as'>		/**
+</span>		* Sets the format used to specify the response format just for this query. Default: json
+		*
+		* @param {String} format type of format (json, xml)
+		* @return {Object} submit object for chaining
+		*/
+		as : function(format) {
+			this.config.format = format;
+			return this;
+		},
+
+<span id='BV-api-submit-method-withFormat'>		/**
+</span>		* Sets the format used to specify the response format just for this query. Default: json
+		*
+		* @param {String} format type of format (json, xml)
+		* @return {Object} submit object for chaining
+		* @chainable
+		*/
+		withFormat : function(format) {
+			return this.as(format);
+		},
+
+<span id='BV-api-submit-method-withPasskey'>		/**
+</span>		* Overrides the config `passkey` value just for this query.
+		*
+		* @param {String} passkey
+		* @return {Object} submit object for chaining
+		*/
+		withPasskey : function(passkey) {
+			this.config.passkey = passkey;
+			return this;
+		},
+
+<span id='BV-api-submit-method-withBaseUrl'>		/**
+</span>		* Overrides the config `baseUrl` value just for this query.
+		*
+		* @param {String} baseUrl
+		* @return {Object} submit object for chaining
+		*/
+		withBaseUrl : function(baseUrl) {
+			this.config.baseUrl = baseUrl;
+			return this;
+		},
+
+<span id='BV-api-submit-method-inLocale'>		/**
+</span>		* Overrides the `locale` config value just for this query.
+		*
+		* @param {String} locale
+		* @return {Object} submit object for chaining
+		*/
+		inLocale : function(locale) {
+			this.config.locale = locale;
+			return this;
+		},
+
+<span id='BV-api-submit-method-locale'>		/**
+</span>		* Overrides the `locale` config value just for this query.
+		*
+		* @param {String} locale
+		* @return {Object} submit object for chaining
+		* @chainable
+		*/		
+		locale : function(locale) {
+			return this.inLocale(locale);
+		},
+
+<span id='BV-api-submit-method-withSubject'>		/**
+</span>		* Add Subject parameter key-vaue pair. If duplicate subjectType is inserted, the last value updated will be used.
+		*
+		* @param {String} subjectType key of parameter pair
+		* @param {String} value
+		* @return {Object} submit object for chaining
+		*/		
+		withSubject : function(subjectType, value) {
+			if ( typeof value === 'undefined') {
+				value = 'true';
+			}
+			this._data[subjectType] = value;
+			return this;
+		},
+
+<span id='BV-api-submit-method-withNthSubject'>		/**
+</span>		* Add Nth-Subject parameter key-value pair. If duplicate subjectType is inserted, the value will be added as an additional N-th parameter.
+		* If duplicate value is inserted, the value will not be duplicated.
+		*
+		* @param {String} subjectType key of parameter pair
+		* @param {String} value
+		* @return {Object} submit object for chaining
+		*/		
+		withNthSubject : function(subjectType, value) {
+			if ( typeof value === 'undefined') {
+				value = 'true';
+			}
+			this._data[subjectType] = _.union(this._data[subjectType] || [], value);
+			return this;
+		},
+
+<span id='BV-api-submit-method-withDimensionIdentifiedSubject'>		/**
+</span>		* Add Dimension Identified Subject parameter key-value pair. If duplicate subjectType and dimensionExternalId pair is inserted, the last value updated will be used.
+		*
+		* @param {String} dimensionExternalId dimension external id key portion of parameter pair
+		* @param {String} value
+		* @return {Object} submit object for chaining
+		* @chainable
+		*/		
+		withDimensionIdentifiedSubject : function(subjectType, dimensionExternalId, value) {
+			var key = subjectType + '_' + dimensionExternalId;
+			return this.withSubject(key, value);
+		},
+
+<span id='BV-api-submit-method-withNthDimensionIdentifiedSubject'>		/**
+</span>		* Add Nth Dimension Identified Subject parameter key-value pair. If duplicate subjectType and dimensionExternalId pair is inserted, the value will be added as an additional N-th parameter.
+		* If duplicate value is inserted, the value will not be duplicated.
+		*
+		* @param {String} subjectType subject type key portion of parameter pair
+		* @param {String} dimensionExternalId dimension external id key portion of parameter pair
+		* @param {String} value
+		* @return {Object} submit object for chaining
+		* @chainable
+		*/		
+		withNthDimensionIdentifiedSubject : function(subjectType, dimensionExternalId, value) {
+			var key = subjectType + '_' + dimensionExternalId;
+			return this.withNthSubject(key, value);
+		},
+
+<span id='BV-api-submit-method-checksum'>		/**
+</span>		* Returns checksum of the serialization of this request.
+		*
+		* @param {String} extra
+		* @return {String} checksum of the serialized url and extra string if passed in
+		*/	
+		checksum : function(extra) {
+			return checksum(this.serialize() + (extra || ''));
+		},
+
+<span id='BV-api-submit-method-getHierarchialPartString'>		/**
+</span>		* Returns hierarchial part of the url string (http://en.wikipedia.org/wiki/URI_scheme).
+		*
+		* @return {String} hierarchial part of url
+		*/	
+		getHierarchialPartString : function() {
+			var path = this._data.submitPrefix + this._data.submitContentType + '.' + this.config.format;
+			return this.config.baseUrl ? this.config.baseUrl + path : path;
+		},
+
+<span id='BV-api-submit-method-getParamsHash'>		/**
+</span>		* Returns params hash of the url string. Hash key and values are not URI encoded.
+		*
+		* @return {String} params hash of url
+		*/
+		getParamsHash : function() {
+			var self = this, query = {}, d = this._data;
+
+			// Let's add in passkey
+			query['passkey'] = self.config.passkey;
+
+			// Apiversion is required
+			query['apiversion'] = self.config.apiversion;
+
+			// Locale is optional
+			if (this.config.locale) {
+				query['locale'] = this.config.locale;
+			}
+
+			// Let's add in subject parameters
+			_(d).forEach(function(value, subject, list) {
+				if (_(value).isArray()) {
+					for (var i = 0; i &lt; value.length; i++) {
+						var enumeratedSubject = subject + '_' + (i + 1);
+						query[enumeratedSubject] = value[i];
+					}
+				} else {
+					// Let's skip these subject in the query since it's included in the hierarchial part
+					if (subject === 'submitContentType' || subject === 'submitPrefix') {
+						return true;
+					}
+					query[subject] = value;
+				}
+			});
+			return query;
+		},
+
+<span id='BV-api-submit-method-getQueryString'>		/**
+</span>		* Return query string of the url string (http://en.wikipedia.org/wiki/URI_scheme).
+		*
+		* @param {Boolean} raw leave query string unencoded
+		* @return {String} query string or url 
+		*/
+		getQueryString : function(raw) {
+
+			var query = this.getParamsHash();
+
+			var keyValStrings = [];
+			for(var key in query){
+				if(raw){
+					keyValStrings.push(key + &quot;=&quot; + query[key]);				
+				} else {
+					keyValStrings.push(global.encodeURIComponent(key) + '=' + global.encodeURIComponent(query[key]));
+				}
+			}
+
+			return keyValStrings.join(&quot;&amp;&quot;);
+		},
+
+<span id='BV-api-submit-method-serialize'>		/**
+</span>		* Serialize submission url.
+		*
+		* @param {Boolean} raw leave query string portion of url unencoded
+		* @return {String} serialized url
+		*/
+		serialize : function(raw) {
+			return this.getHierarchialPartString() + '?' + this.getQueryString(raw);
+		}
+	};
+
+<span id='BV-api-submit-method-__REPLACE_WITH_PREFIX____REPLACE_WITH_SUBMIT_TYPE__'>	/**
+</span>	* @method __REPLACE_WITH_PREFIX____REPLACE_WITH_SUBMIT_TYPE__
+	*
+	* Sugar function for `submit` contructor. Effectively does `submit(__REPLACE_WITH_SUBMIT_TYPE__, __REPLACE_WITH_PREFIX__)`
+	*
+	* Replace `__REPLACE_WITH_SUBMIT_TYPE__` with 'review', 'question', 'answer', 'story', 'reviewComment', 'storyComment', 'photo', 'video', or 'feedback'. 
+	* First letter of `__REPLACE_WITH_SUBMIT_TYPE__` must be capitalized and the rest of the string must be camelCased.
+	* Replace `__REPLACE_WITH_PREFIX__` with 'submit' or 'upload'.
+	* All submit types will use 'submit' prefix except for 'photo' and 'video' which use 'upload'.
+	*
+	* For example, instead of `submit('photo', 'upload')`, use `uploadPhoto()`.
+	*
+	* @return {Object} submit object
+	* @chainable
+	*/
+	_(submitTypes).forEach(function(submitType) {
+		var _prefix = (submitType[1] === undefined) ? 'submit' : submitType[1];
+		var _postfix = submitType[0].substr(0, 1).toUpperCase() + submitType[0].substr(1);
+		// Create the get sugar functions (they are the same)
+		client[(_prefix + _postfix)] = function() {
+			return this.submit(submitType[0], _prefix);
+		};
+	});
+
+<span id='BV-api-submit-method-with__REPLACE_WITH_SUBJECT_TYPE__'>	/**
+</span>	* @method with__REPLACE_WITH_SUBJECT_TYPE__
+	*
+	* Sugar function for `withSubject` method. Effectively does `withSubject(__REPLACE_WITH_SUBJECT_TYPE__, value)`
+	*
+	* Replace `__REPLACE_WITH_SUBJECT_TYPE__` with 'productId', 'action', 'agreeToTermsAndConditions', 'callback', 'campaignId', 'hostedAuthentication_authenticatedEmail', 'hostedAuthentication_callbackUrl', 'isRecommended', 'netPromoterComment', 'netPromoterScore', 'rating', 'reviewText', 'sendEmailAlertWhenCommented', 'sendEmailAlertWhenPublished', 'title', 'user', 'userEmail', 'userId', 'userLocation', 'userNickname', 'questionSummary', 'isUserAnonymous', 'questionDetails', 'categoryId', 'answerText', 'questionId', 'storyText', 'reviewId', 'commentText', 'storyId', 'photo', 'video', 'feedbackType', 'vote', 'reasonText', 'contentId', or 'contentType'. 
+	* First letter of `__REPLACE_WITH_SUBJECT_TYPE__` must be capitalized and the rest of the string must be camelCased.
+	* 
+	* For example, instead of `withSubject('productId', '1234')`, use `withProductId('1234')`.
+	*
+	* @param {String} param value
+	* @return {Object} submit object
+	* @chainable
+	*/
+	_(submitParams).forEach(function(param) {
+		var _postfix = param.substr(0, 1).toUpperCase() + param.substr(1);
+		submit.fn[param] = submit.fn[('with' + _postfix)] = function(value) {
+			return this.withSubject(param, value);
+		}
+	});
+
+<span id='BV-api-submit-method-with__REPLACE_WITH_NTH_SUBJECT_TYPE__'>	/**
+</span>	* @method with__REPLACE_WITH_NTH_SUBJECT_TYPE__
+	* 
+	* Sugar function for `withNthSubject` method. Effectively does `withNthSubject(__REPLACE_WITH_NTH_SUBJECT_TYPE__, value)`
+	*
+	* Replace `__REPLACE_WITH_NTH_SUBJECT_TYPE__` with 'additionalField', 'contextDataValue', 'rating', or 'tagId'.
+	* First letter of `__REPLACE_WITH_NTH_SUBJECT_TYPE__` must be capitalized and the rest of the string must be camelCased.
+	*
+	* For example, instead of `withNthSubject('rating', '1')`, use `withRating('1234')`.
+	*
+	* @param {String} param value
+	* @return {Object} submit object
+	* @chainable
+	*/
+	_(submitNthParams).forEach(function(param) {
+		var _postfix = param.substr(0, 1).toUpperCase() + param.substr(1);
+		submit.fn[param] = submit.fn[('with' + _postfix)] = function(value) {
+			return this.withNthSubject(param, value);
+		}
+	});
+
+<span id='BV-api-submit-method-with__REPLACE_WITH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__'>	/**
+</span>	* @method with__REPLACE_WITH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__
+	*
+	* Sugar function for `withDimensionIdentifiedSubject` method. Effectively does `withDimensionIdentifiedSubject(__REPLACE_WITH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__, dimensionExternalId, value)`
+	*
+	* Replace `__REPLACE_WITH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__` with 'photoCaption', 'photoUrl', 'productRecommendationId', 'videoCaption', or 'videoUrl'.
+	* First letter of `__REPLACE_WITH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__` must be capitalized and the rest of the string must be camelCased.
+	* 
+	* For example, instead of `withDimensionIdentifiedSubject('productRecommendationId', '1234')`, use `withProductRecommendationId('1234')`.
+	*
+	* @param {String} dimensionExternalId
+	* @param {String} param value
+	* @return {Object} submit object
+	* @chainable
+	*/
+	_(submitDimensionIdParams).forEach(function(param) {
+		var _postfix = param.substr(0, 1).toUpperCase() + param.substr(1) + '_';
+		submit.fn[param + '_'] = submit.fn[('with' + _postfix)] = function(dimensionExternalId, value) {
+			return this.withDimensionIdentifiedSubject(param, dimensionExternalId, value);
+		}
+	});
+
+
+<span id='BV-api-submit-method-with__REPLACE_WITH_NTH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__'>	/**
+</span>	* @method with__REPLACE_WITH_NTH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__
+	*
+	* Sugar function for `withNthDimensionIdentifiedSubject` method. Effectively does `withNthDimensionIdentifiedSubject(_REPLACE_WITH_NTH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__, dimensionExternalId, value)`
+	* 
+	* Replace `__REPLACE_WITH_NTH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__` with 'tag'.
+	* First letter of `__REPLACE_WITH_NTH_DIMENSION_IDENTIFIED_SUBJECT_TYPE__` must be capitalized and the rest of the string must be camelCased.
+	* 
+	* For example, instead of `withNthDimensionIdentifiedSubject('tag', '1234')`, use `withTag('1234')`.
+	*
+	* @param {String} dimensionExternalId
+	* @param {String} param value
+	* @return {Object} submit object
+	* @chainable
+	*/	
+	_(submitNthDimensionIdParams).forEach(function(param) {
+		var _postfix = param.substr(0, 1).toUpperCase() + param.substr(1) + '_';
+		submit.fn[param + '_'] = submit.fn[('with' + _postfix)] = function(dimensionExternalId, value) {
+			return this.withNthDimensionIdentifiedSubject(param, dimensionExternalId, value);
+		}
+	});
+
+	submit.fn.init.prototype = submit.fn;
+
+	client.submit = submit;
+
+	// return the submit module.
+	return client;
+});
+</pre>
+</body>
+</html>
