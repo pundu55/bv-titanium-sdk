@@ -4,7 +4,7 @@
 //  ProductsScreen, kicks off a search based on the provided query and displays the results in a table.
 function rowForProduct(product) {
 	var row = Ti.UI.createTableViewRow({
-		height : 70,
+		height : 100,
 		width : "100%",
 		className : "result",
 		hasChild : true
@@ -123,13 +123,24 @@ function ProductsScreen(query) {
 				title : "No Results"
 			});
 			tbl_data.push(row);
+			
+			// this is not efficient, but avoids a drawing bug on android
+			if(Ti.Platform.name == 'android'){
+				table.appendRow(row);
+			}
 		}
 
 		for (var i in results) {
 			var row = rowForProduct(results[i]);
 			tbl_data.push(row);
+			if(Ti.Platform.name == 'android'){
+				table.appendRow(row);
+			}
 		}
-		table.setData(tbl_data);
+		
+		if(Ti.Platform.name == 'iPhone OS') {
+			table.setData(tbl_data);		
+		}
 	}
 
 	return productsScreen;

@@ -16,8 +16,6 @@ function ContainerWindow() {
 
 	});
 
-	Ti.include("/lib/colors.js");
-
 	// Creates a bordered view -- this is the view that will contain all of our content
 	var view = Ti.UI.createView({
 		top : Ti.Platform.name == 'iPhone OS' ? '10%' : '3%',

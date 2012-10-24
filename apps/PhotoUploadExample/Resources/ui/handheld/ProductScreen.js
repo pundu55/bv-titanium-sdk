@@ -94,7 +94,6 @@ function ProductScreen() {
 
 	var dryer = Ti.UI.createImageView({
 		image : "/images/dryer.png",
-		height : "100%",
 		width : "40%",
 		left : "55%"
 	});

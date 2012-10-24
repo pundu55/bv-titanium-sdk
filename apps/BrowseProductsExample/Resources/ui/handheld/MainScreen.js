@@ -21,7 +21,7 @@ function MainScreen() {
 	Ti.include("/lib/colors.js")
 	
 	var textBox = Ti.UI.createTextField({
-		hintText:"try Dryer",
+		hintText:"try Olive",
 		height: Ti.Platform.name == 'iPhone OS' ? 28 : '35dip',
 		paddingLeft:5,
 		paddingRight:5,
