@@ -16,8 +16,6 @@ function showLoadingOverlay(win) {
 		message : 'Loading...',
 		font : 'Arial',
 		color : '#FFF',
-		width : '30%',
-		height: '30%',
 		top: '20%'
 	});
 
@@ -76,15 +74,17 @@ function FormScreen(imData) {
 		editable : true
 	});
 	mainView.add(stars);
-
+	
+	var imViewContainer = Ti.UI.createView({
+		width : "100%",
+		height : "20%"
+	})
 	var imView = Ti.UI.createImageView({
 		image : imData,
-		width : "30%",
-		height : "20%",
-		top : 5,
-		left : "35%"
+		height : "100%"
 	});
-	mainView.add(imView);
+	imViewContainer.add(imView);
+	mainView.add(imViewContainer);
 
 	var nickname = Ti.UI.createTextField({
 		hintText : "Nickname",

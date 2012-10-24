@@ -55,7 +55,9 @@ function rowForReview(review) {
 		text : review.ReviewText,
 		font : {
 			fontSize : 12
-		}
+		},
+		ellipsize: true,
+		wordWrap: false
 	});
 	rowView.add(description);
 	row.add(rowView);
@@ -75,14 +77,20 @@ function DetailScreen(product, reviews) {
 		layout : 'horizontal'
 	});
 
-	var productIm = Ti.UI.createImageView({
-		image : product.ImageUrl ? product.ImageUrl : "/images/camera_icon.gif",
+	// This is sort of a layout hack based on the behavior of the ImageView whereby setting a width OR height, but not both leads to aspect fit behavior.  
+	//  See the ImageView docs for details: http://docs.appcelerator.com/titanium/latest/#!/api/Titanium.UI.ImageView
+	var productImWrapper = Ti.UI.createView({
 		width : "25%",
 		height : "100%",
 		top : 5,
 		left : "5%"
 	});
-	topRow.add(productIm);
+	var productIm = Ti.UI.createImageView({
+		image : product.ImageUrl ? product.ImageUrl : "/images/camera_icon.gif",
+		width: "100%"
+	});
+	productImWrapper.add(productIm);
+	topRow.add(productImWrapper);
 
 	var topRight = Ti.UI.createView({
 		width : '65%',
@@ -124,6 +132,7 @@ function DetailScreen(product, reviews) {
 		height : "50%",
 		width : "100%",
 		ellipsize: true,
+		wordWrap: false,
 		text : product.Description,
 		font : {
 			fontSize : 12

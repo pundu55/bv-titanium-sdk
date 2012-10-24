@@ -38,26 +38,38 @@ function createStars(args) {
 	for (var i = 0; i < args.rating; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star_filled.png",
-			width : "19%"
+			width : "100%"
 		});
 		if(args.editable){
 			star.addEventListener("click", getHandler(i));			
 		}
 		view["star" + i] = star;
-		view.add(star);
+		
+		// This is a ui work around -- we want the star to effectively behave as "aspect fit", while taking up all available space
+		var starWrapper = Ti.UI.createView({
+			width : "19%",
+			height : "100%",
+		});
+		starWrapper.add(star);
+		view.add(starWrapper);
 	}
 	
 	// Lay out unfilled stars...
 	for (var i = args.rating; i < 5; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star.png",
-			width : "19%"
+			width : "100%"
 		});
 		if(args.editable){
 			star.addEventListener("click", getHandler(i));
 		}
 		view["star" + i] = star;
-		view.add(star);
+		var starWrapper = Ti.UI.createView({
+			width : "19%",
+			height : "100%",
+		});
+		starWrapper.add(star);
+		view.add(starWrapper);
 	}
 	
 	return view;

@@ -1,24 +1,26 @@
 Logfile initialized
-[INFO] logfile = /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/build.log
-[DEBUG] /Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py simulator PhotoUploadExample /Users/alex.medearis/android-sdks /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample com.bazaarvoice.photouploadexample 12 WVGA854 
+[INFO] logfile = /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build.log
+[DEBUG] /Users/alex.medearis/Library/Application Support/Titanium/mobilesdk/osx/2.1.1.GA/android/builder.py simulator PhotoUploadExample /Users/alex.medearis/android-sdks /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample com.bazaarvoice.photouploadexample 12 WVGA854 
 [INFO] Building PhotoUploadExample for Android ... one moment
 [INFO] Titanium SDK version: 2.1.1 (07/27/12 14:01 0fd84a2)
 [DEBUG] Waiting for device to be ready ...
-[TRACE] adb devices returned 1 devices/emulators
+[TRACE] adb devices returned 2 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.018215 seconds on emulator to get ready
+[DEBUG] waited 0.029177 seconds on emulator to get ready
 [DEBUG] com.bazaarvoice.photouploadexample installed? True
 [INFO] Fastdev server running, deploying in Fastdev mode
 [INFO] Copying CommonJS modules...
 [INFO] Copying project resources..
-[TRACE] COPYING MODIFIED FILE: /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/Resources/stars/Stars.js => /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/build/android/bin/assets/Resources/stars/Stars.js
+[TRACE] COPYING MODIFIED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/CompletionScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/CompletionScreen.js
+[TRACE] COPYING MODIFIED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/FormScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/FormScreen.js
 [INFO] Tiapp.xml unchanged, skipping class generation
 [DEBUG] Processing Android resource drawables
-[DEBUG] found drawable-hdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/Resources/android/images/res-hdpi/default.png
-[DEBUG] found drawable-ldpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/Resources/android/images/res-ldpi/default.png
-[DEBUG] found drawable-mdpi splash screen at /Users/alex.medearis/Desktop/Titanium Studio Workspace/bv-titanium-sdk/PhotoUploadExample/Resources/android/images/res-mdpi/default.png
+[DEBUG] found drawable-hdpi splash screen at /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-hdpi/default.png
+[DEBUG] found drawable-ldpi splash screen at /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-ldpi/default.png
+[DEBUG] found drawable-mdpi splash screen at /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-mdpi/default.png
 [INFO] Waiting for SDCard to become available..
 [INFO] Re-launching application ... PhotoUploadExample
 [INFO] Launching application ... PhotoUploadExample
 [TRACE] Launch output: Starting: Intent { act=android.intent.action.MAIN cat=[android.intent.category.LAUNCHER] cmp=com.bazaarvoice.photouploadexample/.PhotouploadexampleActivity }
+Warning: Activity not started, its current task has been brought to the front
 

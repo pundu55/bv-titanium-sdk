@@ -51,13 +51,17 @@ function CompletionScreen(review) {
 		layout:"horizontal"
 	})
 	
-	var imView = Ti.UI.createImageView({
-		image : review.image,
+	var imViewContainer = Ti.UI.createView({
 		width : "40%",
 		height : "100%",
 		left: "7%"
+	})
+	var imView = Ti.UI.createImageView({
+		image : review.image,
+		width: "100%"
 	});
-	row.add(imView);
+	imViewContainer.add(imView);
+	row.add(imViewContainer);
 
 	var reviewText = Ti.UI.createLabel({
 		text: review.reviewText,
