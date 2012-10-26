@@ -16,9 +16,14 @@ function createStars(args) {
 	for (var i = 0; i < args.rating; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star_filled.png",
-			width : "19%"
+			width : "100%"
 		});
-		view.add(star);
+		var starWrapper = Ti.UI.createView({
+			width : "19%",
+			height : "100%",
+		});
+		starWrapper.add(star);
+		view.add(starWrapper);
 	}
 	
 
@@ -26,9 +31,14 @@ function createStars(args) {
 	for (var i = args.rating + 1; i <= 5; i++) {
 		var star = Ti.UI.createImageView({
 			image : "/images/graphic_star.png",
-			width : "19%"
+			width : "100%"
 		});
-		view.add(star);
+		var starWrapper = Ti.UI.createView({
+			width : "19%",
+			height : "100%",
+		});
+		starWrapper.add(star);
+		view.add(starWrapper);
 	}
 	
 	return view;
