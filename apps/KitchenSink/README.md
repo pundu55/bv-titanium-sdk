@@ -17,3 +17,6 @@ To import into TitaniumStudio:
 3. Select "Browse" next to "Project Directory" and navigate to the KitchenSink directory.  Click "Open."
 4. TitaniumStudio will import the reference app into the Project Explorer.  
 5. To run, option-click/right-click on the root of the project in the Project Explorer and select "Run As"->IPhone/Android Simulator. 
+
+
+Note: The to-be-imported project must be outside of your default Titanium Projects directory, otherwise the import will fail.
