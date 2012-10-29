@@ -1,5 +1,6 @@
-Bazaarvoice Titanium SDK - Browse Product Example
-Version: 1.0
+#Bazaarvoice Titanium SDK - Browse Product Example
+
+###Version: 1.0
 
 This example app illustrates using the Bazaarvoice iOS SDK to query and browse for products and show ratings and reviews of specified product.
 
