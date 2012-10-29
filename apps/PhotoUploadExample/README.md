@@ -1,5 +1,6 @@
-Bazaarvoice Titanium SDK - Photo Review Upload Example
-Version: 1.0
+#Bazaarvoice Titanium SDK - Photo Review Upload Example
+
+###Version: 1.0
 
 This example illustrates using the Bazaarvoice iOS SDK to submit a photo-review that include a user generated photo (camera/gallery), star rating and review text. 
 

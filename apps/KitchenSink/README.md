@@ -1,5 +1,6 @@
-Bazaarvoice Titanium SDK - Kitchen Sink Example
-Version: 1.0
+#Bazaarvoice Titanium SDK - Kitchen Sink Example
+
+###Version: 1.0
 
 This example illustrates the "Kitchen Sink" of possible display and submission requests via the BV Titanium SDK and displays the expected response.
 
