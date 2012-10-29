@@ -174,6 +174,9 @@ function DetailScreen(product, reviews) {
 	var ReviewDetailScreen = require("ui/handheld/ReviewDetailScreen");
 	table.addEventListener('click', function(e) {
 		var reviewIds = product.ReviewIds;
+		if(reviewIds.length == 0){
+			return;
+		}
 		var reviewId = reviewIds[e.index];
 		var review = reviews[reviewId];
 
