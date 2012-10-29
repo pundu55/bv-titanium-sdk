@@ -90,6 +90,9 @@ function ProductsScreen(query) {
 	// Table click handling -- forward to DetailScreen for clicked product
 	var DetailScreen = require("ui/handheld/DetailScreen");
 	table.addEventListener('click', function(e) {
+		if(response.Results.length == 0){
+			return;
+		}
 		var product = response.Results[e.index];
 		var detailScreen = new DetailScreen(product, response.Includes.Reviews);
 		detailScreen.nav = productsScreen.nav;
