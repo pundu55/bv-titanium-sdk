@@ -5,27 +5,11 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.015214 seconds on emulator to get ready
+[DEBUG] waited 0.014912 seconds on emulator to get ready
 [DEBUG] com.bazaarvoice.photouploadexample installed? False
 [INFO] Copying CommonJS modules...
 [INFO] Copying project resources..
-[INFO] Detected change in tiapp.xml, or assets deleted. Forcing full re-build...
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/appicon.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/appicon.png
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/app.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/app.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/images/app_background2.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/images/app_background2.png
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/images/bv_icon.jpg => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/images/bv_icon.jpg
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/images/dryer.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/images/dryer.png
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/images/test.jpg => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/images/test.jpg
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/KS_nav_ui.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/KS_nav_ui.png
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/KS_nav_views.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/KS_nav_views.png
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/lib/bv-js-sdk.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/lib/bv-js-sdk.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/lib/colors.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/lib/colors.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/stars/Stars.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/stars/Stars.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/CompletionScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/CompletionScreen.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/ContainerWindow.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/ContainerWindow.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/FormScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/FormScreen.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/Navigation.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/Navigation.js
-[TRACE] COPYING CREATED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/ProductScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/ProductScreen.js
+[TRACE] COPYING MODIFIED FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/ui/handheld/FormScreen.js => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/ui/handheld/FormScreen.js
 [TRACE] Generating Java Classes
 [DEBUG] Processing Android resource drawables
 [TRACE] COPYING FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-hdpi/app_background2.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/res/drawable-hdpi/app_background2_745a823bc6.png
@@ -49,7 +33,6 @@ Logfile initialized
 [TRACE] COPYING FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-mdpi/graphic_star_green.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/res/drawable-mdpi/graphic_star_green_442d079e06.png
 [TRACE] COPYING FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-mdpi/graphic_star_half.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/res/drawable-mdpi/graphic_star_half_9b3c378ad7.png
 [TRACE] COPYING FILE: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-mdpi/graphic_star_white.png => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/res/drawable-mdpi/graphic_star_white_28fe6fa036.png
-[DEBUG] app stylesheet => /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/ApplicationStylesheet.java
 [DEBUG] copying app icon: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/assets/Resources/appicon.png
 [DEBUG] generating theme.xml
 [DEBUG] found drawable-hdpi splash screen at /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-hdpi/default.png
@@ -60,12 +43,11 @@ Logfile initialized
 [DEBUG] copying /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/Resources/android/images/res-mdpi/default.png splash screen to /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/res/drawable-mdpi/background.png
 [DEBUG] copying default splash screen
 [TRACE] Writing out AndroidManifest.xml
-[DEBUG] adding /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/ApplicationStylesheet.java to javac build list
 [DEBUG] adding /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleActivity.java to javac build list
 [DEBUG] adding /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleAppInfo.java to javac build list
 [DEBUG] adding /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleApplication.java to javac build list
 [DEBUG] adding /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/R.java to javac build list
-[DEBUG] Building Java Sources: "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/ApplicationStylesheet.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleActivity.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleAppInfo.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleApplication.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/R.java"
+[DEBUG] Building Java Sources: "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleActivity.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleAppInfo.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/PhotouploadexampleApplication.java" "/Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/gen/com/bazaarvoice/photouploadexample/R.java"
 [INFO] Compiling Android Resources... This could take some time
 [DEBUG] Android classes.dex built
 [DEBUG] creating unsigned apk: /Users/alex.medearis/Desktop/bv-titanium-sdk/apps/PhotoUploadExample/build/android/bin/app-unsigned.apk
@@ -142,6 +124,6 @@ Logfile initialized
 [DEBUG] Waiting for device to be ready ...
 [TRACE] adb devices returned 1 devices/emulators
 [DEBUG] Device connected... (waited 0 seconds)
-[DEBUG] waited 0.014984 seconds on emulator to get ready
+[DEBUG] waited 0.016014 seconds on emulator to get ready
 [INFO] Installing application on device
 [INFO] Application installed. Launch from drawer on Home Screen
