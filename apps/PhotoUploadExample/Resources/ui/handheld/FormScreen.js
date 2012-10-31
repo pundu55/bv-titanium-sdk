@@ -3,29 +3,6 @@
 //
 //  FormScreen allows the user to enter a review.  Handles both photo upload and review submission callbacks.
 
-function showLoadingOverlay(win) {
-	var loadView = Ti.UI.createView({
-		backgroundColor : 'black',
-		opacity : 0.5,
-		height : '100%',
-		width : '100%'
-	});
-
-	var loadIndicator = Ti.UI.createActivityIndicator({
-		style : Ti.UI.iPhone.ActivityIndicatorStyle.BIG,
-		message : 'Loading...',
-		font : 'Arial',
-		color : '#FFF',
-		top: '20%'
-	});
-
-	loadView.add(loadIndicator);
-	
-	win.add(loadView);
-	
-	loadIndicator.show();
-}
-
 function FormScreen(imData) {
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
 	var formScreen = new ContainerWindow();
@@ -67,14 +44,14 @@ function FormScreen(imData) {
 
 	var stars = Stars.createStars({
 		top : 0,
-		left: 5,
+		left : 5,
 		width : "100%",
 		height : "20%",
 		rating : 2,
 		editable : true
 	});
 	mainView.add(stars);
-	
+
 	var imViewContainer = Ti.UI.createView({
 		width : "100%",
 		height : "20%"
@@ -133,6 +110,25 @@ function FormScreen(imData) {
 	scrollView.add(mainView);
 	formScreen.mainView.add(scrollView);
 
+	var loadView = Ti.UI.createView({
+		backgroundColor : 'black',
+		opacity : 0.5,
+		height : '100%',
+		width : '100%',
+		visible: false
+	});
+	var loadIndicator = Ti.UI.createActivityIndicator({
+		style : Ti.UI.iPhone.ActivityIndicatorStyle.BIG,
+		message : 'Loading...',
+		font : 'Arial',
+		color : '#FFF',
+		top : '20%'
+	});
+	loadView.add(loadIndicator);
+	loadView.loadIndicator = loadIndicator;
+	formScreen.loadView = loadView;
+	formScreen.add(loadView);
+
 	// Initialize the BV library with the appropriate params
 	var BV = require("lib/bv-js-sdk");
 	BV.config({
@@ -151,23 +147,24 @@ function FormScreen(imData) {
 	// Submit click handler... if the photo upload is completed, kick off the review submission, otherwise,
 	// note the click but don't do anything.
 	submit.addEventListener("click", function() {
-		if(title.value.length == 0){
+		if (title.value.length == 0) {
 			alert("Please provide a title.");
 			return;
 		}
-		if(stars.rating == 0){
+		if (stars.rating == 0) {
 			alert("Please provide a star rating.");
 			return;
 		}
-		if(reviewText.value.length == 0){
+		if (reviewText.value.length == 0) {
 			alert("Please provide a review.");
 			return;
 		}
-		if(nickname.value == 0){
+		if (nickname.value == 0) {
 			alert("Please provide a nickname.");
 			return;
 		}
-		showLoadingOverlay(formScreen);
+		formScreen.loadView.show();
+		formScreen.loadView.loadIndicator.show();
 		submitClicked = true;
 		if (photoUploadUrl != "") {
 			submitReview();
@@ -193,9 +190,8 @@ function FormScreen(imData) {
 			reviewText : reviewText.value
 		});
 		completionScreen.nav = formScreen.nav;
-		// Note that we close this screen before forwarding -- this is so that a back button press on the completion
-		// screen takes the user back to the initial product screen
-		//formScreen.nav.closeWindow(formScreen, false);
+		formScreen.loadView.hide();
+		formScreen.loadView.loadIndicator.hide();
 		formScreen.nav.pushWindow(completionScreen);
 	}
 

@@ -11,38 +11,7 @@ var BV = require("lib/bv-js-sdk");
 		normalize : false
 	});
 
-function fetchImage2() {
-	Titanium.Media.showCamera({
-		success : function(event) {
-			// called when media returned from the camera
-			Ti.API.debug('Our type was: ' + event.mediaType);
-			if (event.mediaType == Ti.Media.MEDIA_TYPE_PHOTO) {
-				//TODO: send event.media as photo
-			} else {
-				alert("got the wrong type back =" + event.mediaType);
-			}
-		},
-		cancel : function() {
-			// called when user cancels taking a picture
-		},
-		error : function(error) {
-			// called when there's an error
-			var a = Titanium.UI.createAlertDialog({
-				title : 'Camera'
-			});
-			if (error.code == Titanium.Media.NO_CAMERA) {
-				a.setMessage('Please run this test on device');
-			} else {
-				a.setMessage('Unexpected error: ' + error.code);
-			}
-			a.show();
-		},
-		saveToPhotoGallery : true,
-		allowEditing : true,
-		mediaTypes : [Ti.Media.MEDIA_TYPE_PHOTO]
-	});
 
-}
 
 function ProductScreen() {
 	var ContainerWindow = require('ui/handheld/ContainerWindow');
@@ -72,13 +41,45 @@ function ProductScreen() {
 		left : "5%",
 	})
 	
+	function fetchImage() {
+		Titanium.Media.showCamera({
+			success : function(event) {
+				if (event.mediaType == Ti.Media.MEDIA_TYPE_PHOTO) {
+					var FormScreen = require("ui/handheld/FormScreen");
+					var formScreen = new FormScreen(event.media);
+					formScreen.nav = productScreen.nav;
+			
+					BV.uploadPhoto().withContentType('review').withUserId('craiggil').withPhoto(event.media).send({success: formScreen.handlePhotoData, error: formScreen.onError});;
+					productScreen.nav.pushWindow(formScreen);
+				} 
+			},
+			cancel : function() {
+				// called when user cancels taking a picture
+			},
+			error : function(error) {
+
+				if (error.code == Titanium.Media.NO_CAMERA) {
+					loadImageFromDisk();
+				} else {
+					// called when there's an error
+					var a = Titanium.UI.createAlertDialog({
+						title : 'Camera'
+					});
+					a.setMessage('Unexpected error: ' + error.code);
+					a.show();
+				}
+			},
+			saveToPhotoGallery : true,
+			allowEditing : true,
+			mediaTypes : [Ti.Media.MEDIA_TYPE_PHOTO]
+		});
+	}
 	
-	function fetchImage(){
+	function loadImageFromDisk(){
 		// resourcesDirectory is actually the default location, so the first 
 		// argument could be omitted here.
 		var file = Ti.Filesystem.getFile(Titanium.Filesystem.resourcesDirectory,'images/test.jpg');
 		var blob = file.read();
-		Ti.API.log(blob);
 		
 		var FormScreen = require("ui/handheld/FormScreen");
 		var formScreen = new FormScreen(blob);
