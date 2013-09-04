@@ -11,10 +11,10 @@
     <id>com.bazaarvoice.kitchensink</id>
     <name>KitchenSink</name>
     <version>1.0</version>
-    <publisher>alex.medearis</publisher>
+    <publisher>bazaarvoice</publisher>
     <url>http://developer.bazaarvoice.com</url>
     <description>not specified</description>
-    <copyright>2012 by alex.medearis</copyright>
+    <copyright>2012 by bazaarvoice</copyright>
     <icon>appicon.png</icon>
     <persistent-wifi>false</persistent-wifi>
     <prerendered-icon>false</prerendered-icon>
