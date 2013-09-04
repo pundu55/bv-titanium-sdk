@@ -1,5 +1,5 @@
 # Bazaarvoice Titanium SDK 
-### *Version 1.3.0* (Pre-Alpha)	
+### *Version 1.0* (Alpha)	
 
 ## Introduction
 The Bazaarvoice software development kit (SDK) for Appcelerator Titanium is a JavaScript that provides an easy way to generate REST calls to the Bazaarvoice Developer API. Using this SDK, mobile developers can quickly integrate Bazaarvoice content into their Titanium Apps.
